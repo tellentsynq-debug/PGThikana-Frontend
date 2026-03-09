@@ -1,0 +1,30 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orange background -->
+  <rect x="40" y="60" width="175" height="175" rx="20" fill="#f97316"/>
+  
+  <!-- Dark blue border/frame -->
+  <rect x="30" y="50" width="195" height="195" rx="25" fill="none" stroke="#082f49" stroke-width="8"/>
+  
+  <!-- House roof shape -->
+  <path d="M 128 80 L 170 110 L 170 140 Q 170 150 160 150 L 96 150 Q 86 150 86 140 L 86 110 Z" fill="#082f49" opacity="0.9"/>
+  
+  <!-- Face -->
+  <circle cx="128" cy="130" r="25" fill="#fef3c7"/>
+  
+  <!-- Hair -->
+  <path d="M 103 115 Q 103 95 128 95 Q 153 95 153 115 Z" fill="#082f49"/>
+  
+  <!-- Eyes -->
+  <circle cx="120" cy="125" r="3" fill="#082f49"/>
+  <circle cx="136" cy="125" r="3" fill="#082f49"/>
+  
+  <!-- Smile -->
+  <path d="M 120 135 Q 128 140 136 135" stroke="#082f49" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Shirt/Collar -->
+  <rect x="105" y="150" width="46" height="35" rx="3" fill="#fef3c7"/>
+  <path d="M 115 150 L 120 160 M 141 150 L 136 160" stroke="#082f49" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Window -->
+  <rect x="135" y="85" width="18" height="15" rx="2" fill="#082f49" opacity="0.6"/>
+</svg>

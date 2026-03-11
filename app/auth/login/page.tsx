@@ -2,17 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LogIn, Lock, User, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { LogIn, Lock, User, AlertCircle, Eye, EyeOff, Shield, UserPlus } from "lucide-react";
+import Image from "next/image";
 import { Input } from "@/app/components/Input";
-import { Button } from "@/app/components/Button";
-import { colors } from "@/app/config/colors";
+
+// Orange and Dark Blue Theme
+const themeColors = {
+  darkBlue: "#082f49",
+  orange: "#f97316",
+  orange2: "#fb923c",
+  lightOrange: "#fed7aa",
+};
+
+type FormFields = "username" | "password";
+
+type FieldErrors = Partial<Record<FormFields, string>>;
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -23,26 +35,40 @@ export default function LoginPage() {
       ...prev,
       [name]: value,
     }));
-    setError("");
+    // Clear field error on change
+    setFieldErrors((prev) => ({ ...prev, [name as FormFields]: undefined }));
+    setGlobalError("");
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const validateLogin = (): boolean => {
+    const errors: FieldErrors = {};
 
-    // Validation
     if (!formData.username.trim()) {
-      setError("Username is required");
-      setLoading(false);
-      return;
+      errors.username = "Username is required";
+    } else if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
     }
 
     if (!formData.password) {
-      setError("Password is required");
-      setLoading(false);
-      return;
+      errors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
     }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const borderColor = (field: FormFields) =>
+    fieldErrors[field] ? "#dc2626" : themeColors.lightOrange;
+
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setGlobalError("");
+
+    if (!validateLogin()) return;
+
+    setLoading(true);
 
     try {
       const response = await fetch("https://pgthikana.in/api/super-login", {
@@ -57,14 +83,19 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Something went wrong. Please try again.");
+        if (data.field && data.message) {
+          setFieldErrors({ [data.field]: data.message });
+        } else {
+          setGlobalError(data.message || "Something went wrong. Please try again.");
+        }
         return;
       }
 
       setSuccess(true);
       setFormData({ username: "", password: "" });
-    } catch {
-      setError("Network error. Please check your connection and try again.");
+    } catch (error) {
+      console.error('Network error:', error);
+      setGlobalError("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -72,18 +103,24 @@ export default function LoginPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-sky-50 to-orange-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full">
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: themeColors.darkBlue }}
+      >
+        <div
+          className="rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border-4"
+          style={{ backgroundColor: "white", borderColor: themeColors.orange }}
+        >
           <div
             className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: colors.primary[600] }}
+            style={{ backgroundColor: themeColors.orange }}
           >
             <LogIn className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">
+          <h2 className="text-2xl font-bold mb-2" style={{ color: themeColors.darkBlue }}>
             Login Successful! 🎯
           </h2>
-          <p className="text-neutral-600">
+          <p style={{ color: themeColors.darkBlue }}>
             Welcome back, Super Admin. Redirecting to dashboard...
           </p>
         </div>
@@ -92,159 +129,221 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-sky-50 via-white to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div
-            className="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: colors.primary[600] }}
-          >
-            <LogIn className="w-7 h-7 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-neutral-600">
-            Super Admin Login Portal
-          </p>
-        </div>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: themeColors.darkBlue }}
+    >
+      <div className="w-full max-w-6xl">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-        {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-neutral-100">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-              <span className="text-sm text-red-800">{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username Input */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-neutral-900">
-                <div className="flex items-center gap-2 mb-2">
-                  <User
-                    className="w-4 h-4"
-                    style={{ color: colors.primary[600] }}
+          {/* LEFT SIDE - IMAGE SECTION */}
+          <div className="hidden lg:flex items-center justify-center">
+            <div className="relative w-full max-w-sm">
+              <div
+                className="w-96 h-96 rounded-full flex items-center justify-center mx-auto shadow-2xl border-8"
+                style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
+              >
+                <div className="text-center">
+                  <Image
+                    src="/pg-icon.svg"
+                    alt="PG House"
+                    width={200}
+                    height={200}
+                    className="mx-auto mb-4"
+                    priority
                   />
-                  Username
+                  <p className="text-white text-2xl font-bold">Welcome</p>
+                  <p className="text-orange-100 text-sm mt-2"><span className="font-bold">Super</span> Admin</p>
+                  <p className="text-orange-100 text-sm mt-2 font-bold">Pgthikana</p>
                 </div>
-              </label>
-              <Input
-                type="text"
-                name="username"
-                placeholder="Enter your username"
-                value={formData.username}
-                onChange={handleChange}
-                disabled={loading}
-                autoComplete="username"
+              </div>
+              <div
+                className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
+                style={{ backgroundColor: themeColors.orange }}
+              />
+              <div
+                className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10"
+                style={{ backgroundColor: "white" }}
               />
             </div>
-
-            {/* Password Input */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-neutral-900">
-                <div className="flex items-center gap-2 mb-2">
-                  <Lock
-                    className="w-4 h-4"
-                    style={{ color: colors.primary[600] }}
-                  />
-                  Password
-                </div>
-              </label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  disabled={loading}
-                  autoComplete="current-password"
-                  className="pr-12"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 transition-colors"
-                  disabled={loading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-neutral-700 cursor-pointer hover:text-neutral-900 transition-colors">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded"
-                  style={{ accentColor: colors.primary[600] }}
-                />
-                Remember me
-              </label>
-              <Link
-                href="#"
-                className="font-medium transition-colors hover:underline"
-                style={{ color: colors.primary[600] }}
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-6 text-base font-semibold"
-            >
-              {loading ? (
-                <>
-                  <span className="inline-block animate-spin mr-2">⏳</span>
-                  Logging In...
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  Log In
-                </>
-              )}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-neutral-600">or</span>
-            </div>
           </div>
 
-          {/* Sign Up Link */}
-          <p className="text-center text-neutral-600">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/super-admin/signup"
-              className="font-semibold"
-              style={{ color: colors.primary[600] }}
+          {/* RIGHT SIDE - FORM */}
+          <div>
+            {/* Toggle Buttons */}
+            <div className="flex gap-3 mb-6 bg-white rounded-lg p-1 shadow-lg">
+              <button
+                disabled
+                className="flex-1 py-3 px-6 rounded-md font-semibold transition-all"
+                style={{
+                  backgroundColor: themeColors.orange,
+                  color: "white",
+                }}
+              >
+                <LogIn className="w-4 h-4 inline mr-2" />
+                Login
+              </button>
+              <Link
+                href="/super-admin/signup"
+                className="flex-1 py-3 px-6 rounded-md font-semibold transition-all text-center"
+                style={{
+                  backgroundColor: "transparent",
+                  color: themeColors.darkBlue,
+                }}
+              >
+                <UserPlus className="w-4 h-4 inline mr-2" />
+                Sign Up
+              </Link>
+            </div>
+            {/* Header */}
+            <div
+              className="text-center mb-8 rounded-3xl p-8 border-4"
+              style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
             >
-              Sign Up
-            </Link>
-          </p>
-        </div>
+              <div
+                className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center border-4"
+                style={{ backgroundColor: "white", borderColor: themeColors.darkBlue }}
+              >
+                <LogIn className="w-8 h-8" style={{ color: themeColors.orange }} />
+              </div>
+              <h1 className="text-4xl font-bold text-white mb-2">Super Admin Login</h1>
+              <p className="text-orange-50 text-lg">Enter your credentials to access the portal</p>
 
-        {/* Footer */}
-        <p className="text-xs text-center text-neutral-500 mt-6">
-          Super Admin Portal. Keep your credentials secure.
-        </p>
+              {/* Global Error */}
+              {globalError && (
+                <div className="mt-4 p-4 border-2 rounded-lg" style={{ backgroundColor: "#fee2e2", borderColor: "#dc2626" }}>
+                  <div className="flex gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <span className="text-sm text-red-800">{globalError}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* LOGIN FORM */}
+              <form onSubmit={handleLoginSubmit} className="mt-6 space-y-4" noValidate>
+                {/* Username */}
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4" />
+                      Username
+                    </div>
+                  </label>
+                  <Input
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    disabled={loading}
+                    autoComplete="username"
+                    className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300"
+                    style={{ borderColor: borderColor("username") }}
+                  />
+                  {fieldErrors.username && (
+                    <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3 h-3" /> {fieldErrors.username}
+                    </p>
+                  )}
+                </div>
+
+                {/* Password */}
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lock className="w-4 h-4" />
+                      Password
+                    </div>
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      disabled={loading}
+                      autoComplete="current-password"
+                      className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300 pr-10"
+                      style={{ borderColor: borderColor("password") }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      disabled={loading}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {fieldErrors.password ? (
+                    <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3 h-3" /> {fieldErrors.password}
+                    </p>
+                  ) : (
+                    <p className="text-xs font-medium mt-1" style={{ color: themeColors.darkBlue }}>
+                      Must be at least 6 characters long
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full text-base font-bold rounded-lg py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{ backgroundColor: "white", color: themeColors.orange }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themeColors.lightOrange)}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      Logging In...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-5 h-5" />
+                      Log In
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-orange-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 text-orange-50">or</span>
+                </div>
+              </div>
+
+              {/* Sign Up Link */}
+              <p className="text-center text-orange-50">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/super-admin/signup"
+                  className="font-semibold hover:underline"
+                  style={{ color: "white" }}
+                >
+                  Sign Up
+                </Link>
+              </p>
+            </div>
+
+            {/* Footer */}
+            <p className="text-sm text-center font-semibold mt-6" style={{ color: themeColors.orange }}>
+              Super Admin Portal - Secure Login
+            </p>
+          </div>
+
+        </div>
       </div>
     </div>
   );

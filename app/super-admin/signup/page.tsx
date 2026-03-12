@@ -89,7 +89,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://pgthikana.in/api/super-signup/otp", {
+      const response = await fetch("/api/super-signup/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

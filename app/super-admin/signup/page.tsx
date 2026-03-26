@@ -7,11 +7,9 @@ import Image from "next/image";
 import { Input } from "@/app/components/Input";
 
 // Orange and Dark Blue Theme
-const themeColors = {
-  darkBlue: "#082f49",
-  orange: "#f97316",
-  orange2: "#fb923c",
-  lightOrange: "#fed7aa",
+const themecColors = {
+  darkBlue: "#0D5F58",
+  white:"rgb(254, 254, 254)"
 };
 
 type FormFields = "username" | "password" | "otp";
@@ -98,10 +96,10 @@ export default function SignupPage() {
         }),
       });
 
-      console.log('OTP Send Response:', response.status, response.statusText);
+     
 
       const data = await response.json();
-      console.log('OTP Send Response Data:', data);
+
 
       if (!response.ok) {
         if (data.field && data.message) {
@@ -141,10 +139,10 @@ export default function SignupPage() {
         }),
       });
 
-      console.log('OTP Verify Response:', response.status, response.statusText);
+
 
       const data = await response.json();
-      console.log('OTP Verify Response Data:', data);
+
 
       if (!response.ok) {
         if (data.field && data.message) {
@@ -167,34 +165,34 @@ export default function SignupPage() {
 
   // Helper: border color based on field error state
   const borderColor = (field: FormFields) =>
-    fieldErrors[field] ? "#dc2626" : themeColors.lightOrange;
+    fieldErrors[field] ? "#dc2626" : themecColors.darkBlue;
 
   if (success) {
     return (
       <div
         className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: themeColors.darkBlue }}
+        style={{ backgroundColor: themecColors.darkBlue }}
       >
         <div
           className="rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border-4"
-          style={{ backgroundColor: "white", borderColor: themeColors.orange }}
+          style={{ backgroundColor: "white", borderColor: themecColors.darkBlue }}
         >
           <div
             className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: themeColors.orange }}
+            style={{ backgroundColor: themecColors.darkBlue }}
           >
             <UserPlus className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: themeColors.darkBlue }}>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: themecColors.darkBlue }}>
             {getGreeting()}, Super Admin! 🎉
           </h2>
-          <p style={{ color: themeColors.darkBlue }}>
+          <p style={{ color: themecColors.darkBlue }}>
             Super admin account created successfully. Redirecting to login...
           </p>
           <Link
             href="/auth/login"
             className="mt-4 inline-block font-bold hover:underline"
-            style={{ color: themeColors.orange }}
+            style={{ color: themecColors.darkBlue }}
           >
             Go to Login →
           </Link>
@@ -206,7 +204,7 @@ export default function SignupPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: themeColors.darkBlue }}
+      style={{ backgroundColor: themecColors.white }}
     >
       <div className="w-full max-w-6xl">
         {/* Two Column Layout */}
@@ -217,11 +215,11 @@ export default function SignupPage() {
             <div className="relative w-full max-w-sm">
               <div
                 className="w-96 h-96 rounded-full flex items-center justify-center mx-auto shadow-2xl border-8"
-                style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
+                style={{ backgroundColor: themecColors.darkBlue, borderColor: themecColors.darkBlue }}
               >
                 <div className="text-center">
                   <Image
-                    src="/pg-icon.svg"
+                    src="/pg_logo.png"
                     alt="PG House"
                     width={200}
                     height={200}
@@ -230,12 +228,12 @@ export default function SignupPage() {
                   />
                   <p className="text-white text-2xl font-bold">Welcome</p>
                   <p className="text-orange-100 text-sm mt-2"><span className="font-bold">Super</span> Admin</p>
-                  <p className="text-orange-100 text-sm mt-2 font-bold">Pgthikana</p>
+                  <p className="text-orange-100 text-sm mt-2 font-bold">Pg Thikana</p>
                 </div>
               </div>
               <div
                 className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
-                style={{ backgroundColor: themeColors.orange }}
+                style={{ backgroundColor: themecColors.darkBlue }}
               />
               <div
                 className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10"
@@ -253,7 +251,7 @@ export default function SignupPage() {
                 className="flex-1 py-3 px-6 rounded-md font-semibold transition-all text-center"
                 style={{
                   backgroundColor: "transparent",
-                  color: themeColors.darkBlue,
+                  color: themecColors.darkBlue,
                 }}
               >
                 <LogIn className="w-4 h-4 inline mr-2" />
@@ -263,7 +261,7 @@ export default function SignupPage() {
                 disabled
                 className="flex-1 py-3 px-6 rounded-md font-semibold transition-all"
                 style={{
-                  backgroundColor: themeColors.orange,
+                  backgroundColor: themecColors.darkBlue,
                   color: "white",
                 }}
               >
@@ -274,20 +272,20 @@ export default function SignupPage() {
             {/* Header */}
             <div
               className="text-center mb-8 rounded-3xl p-8 border-4"
-              style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
+              style={{ backgroundColor: themecColors.darkBlue, borderColor: themecColors.darkBlue }}
             >
               <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center border-4"
-                style={{ backgroundColor: "white", borderColor: themeColors.darkBlue }}
+                style={{ backgroundColor: "white", borderColor: themecColors.darkBlue }}
               >
                 {step === "signup" ? (
-                  <Home className="w-8 h-8" style={{ color: themeColors.orange }} />
+                  <Home className="w-8 h-8" style={{ color: themecColors.darkBlue }} />
                 ) : (
-                  <Shield className="w-8 h-8" style={{ color: themeColors.orange }} />
+                  <Shield className="w-8 h-8" style={{ color: themecColors.darkBlue }} />
                 )}
               </div>
               <h1 className="text-4xl font-bold text-white mb-2">
-                {step === "signup" ? "Create Account pgthikana" : "Verify Mobile OTP"}
+                {step === "signup" ? "Create Account" : "Verify Mobile OTP"}
               </h1>
               <p className="text-orange-50 text-lg">
                 {step === "signup" ? "Super Admin Registration" : "Enter the 6-digit OTP sent to your mobile"}
@@ -320,7 +318,7 @@ export default function SignupPage() {
                       value={formData.username}
                       onChange={handleChange}
                       disabled={loading}
-                      className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300"
+                      className="border-2 focus:border-[#0D5F58] focus:ring-2 focus:ring-[#0D5F58]"
                       style={{ borderColor: borderColor("username") }}
                     />
                     {fieldErrors.username && (
@@ -346,7 +344,7 @@ export default function SignupPage() {
                         value={formData.password}
                         onChange={handleChange}
                         disabled={loading}
-                        className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300 pr-10"
+                        className="border-2 focus:border-[#0D5F58] focus:ring-2 focus:ring-[#0D5F58] pr-10"
                         style={{ borderColor: borderColor("password") }}
                       />
                       <button
@@ -362,7 +360,7 @@ export default function SignupPage() {
                         <AlertCircle className="w-3 h-3" /> {fieldErrors.password}
                       </p>
                     ) : (
-                      <p className="text-xs font-medium mt-1" style={{ color: themeColors.darkBlue }}>
+                      <p className="text-xs font-medium mt-1" style={{ color: themecColors.darkBlue }}>
                         Must be at least 6 characters long
                       </p>
                     )}
@@ -373,8 +371,8 @@ export default function SignupPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full text-base font-bold rounded-lg py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    style={{ backgroundColor: "white", color: themeColors.orange }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themeColors.lightOrange)}
+                    style={{ backgroundColor: "white", color: themecColors.darkBlue }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "grey")}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
                   >
                     {loading ? (
@@ -410,7 +408,7 @@ export default function SignupPage() {
                       value={formData.otp}
                       onChange={handleChange}
                       disabled={loading}
-                      className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300 text-center text-2xl tracking-widest"
+                      className="border-2 focus:border-[#0D5F58] focus:ring-2 focus:ring-[#0D5F58] text-center text-2xl tracking-widest"
                       style={{ borderColor: borderColor("otp") }}
                       maxLength={6}
                     />
@@ -419,7 +417,7 @@ export default function SignupPage() {
                         <AlertCircle className="w-3 h-3" /> {fieldErrors.otp}
                       </p>
                     )}
-                    <p className="text-xs font-medium mt-1" style={{ color: themeColors.darkBlue }}>
+                    <p className="text-xs font-medium mt-1" style={{ color: themecColors.darkBlue }}>
                       OTP will be sent to your registered mobile number
                     </p>
                   </div>
@@ -429,8 +427,8 @@ export default function SignupPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full text-base font-bold rounded-lg py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    style={{ backgroundColor: "white", color: themeColors.orange }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themeColors.lightOrange)}
+                    style={{ backgroundColor: "white", color: themecColors.darkBlue }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themecColors.darkBlue)}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
                   >
                     {loading ? (
@@ -460,7 +458,7 @@ export default function SignupPage() {
                     }}
                     disabled={loading}
                     className="w-full text-sm font-medium rounded-lg py-2 transition-all hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: themeColors.darkBlue, backgroundColor: "transparent" }}
+                    style={{ color: themecColors.darkBlue, backgroundColor: "transparent" }}
                   >
                     ← Back to Registration
                   </button>
@@ -469,7 +467,7 @@ export default function SignupPage() {
             </div>
 
             {/* Footer — single instance, visible on all screen sizes */}
-            <p className="text-sm text-center font-semibold mt-6" style={{ color: themeColors.orange }}>
+            <p className="text-sm text-center font-semibold mt-6" style={{ color: themecColors.darkBlue }}>
               Super Admin Portal - Professional Registration
             </p>
           </div>

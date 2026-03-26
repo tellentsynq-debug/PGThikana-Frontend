@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LogIn, UserPlus, Shield } from "lucide-react";
 import { colors } from "@/app/config/colors";
+import Navbar from "./components/Navbar"
 
 export default function Home() {
   return (

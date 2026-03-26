@@ -5,13 +5,13 @@ import Link from "next/link";
 import { LogIn, Mail, Lock, AlertCircle, Home, Shield, Eye, EyeOff, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/app/components/Input";
+import { useRouter } from "next/navigation"; 
 
 // Orange and Dark Blue Theme
 const themeColors = {
-  darkBlue: "#082f49",
-  orange: "#f97316",
-  orange2: "#fb923c",
-  lightOrange: "#fed7aa",
+  darkBlue: "#0D5F58",
+  white:"#fdfdfd",
+  grey:"#8d8887"
 };
 
 type FormFields = "username" | "password";
@@ -27,6 +27,8 @@ export default function SuperAdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -76,10 +78,10 @@ export default function SuperAdminLoginPage() {
         }),
       });
 
-      console.log('Login Response:', response.status, response.statusText);
+
 
       const data = await response.json();
-      console.log('Login Response Data:', data);
+
 
       if (!response.ok) {
         if (data.field && data.message) {
@@ -90,9 +92,11 @@ export default function SuperAdminLoginPage() {
         return;
       }
 
-      setSuccess(true);
-      // Handle successful login (redirect or store token)
-      console.log('Login successful:', data);
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("username",data.user.username);
+      localStorage.setItem("role",data.user.role);
+      router.push("/super-admin");
     } catch (error) {
       console.error('Network error:', error);
       setGlobalError("Network error. Please check your connection and try again.");
@@ -103,40 +107,40 @@ export default function SuperAdminLoginPage() {
 
   const borderColor = (field: FormFields) => {
     if (fieldErrors[field]) return "#dc2626"; // red-600
-    return themeColors.lightOrange;
+    return themeColors.darkBlue;
   };
 
-  if (success) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: themeColors.darkBlue }}
-      >
-        <div
-          className="rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border-4"
-          style={{ backgroundColor: "white", borderColor: themeColors.orange }}
-        >
-          <div
-            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: themeColors.orange }}
-          >
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: themeColors.darkBlue }}>
-            {getGreeting()}, Super Admin! 🎉
-          </h2>
-          <p style={{ color: themeColors.darkBlue }}>
-            Login successful. Redirecting to dashboard...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // if (success) {
+  //   return (
+  //     <div
+  //       className="min-h-screen flex items-center justify-center p-4"
+  //       style={{ backgroundColor: themeColors.white }}
+  //     >
+  //       <div
+  //         className="rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border-4"
+  //         style={{ backgroundColor: "white", borderColor: themeColors.darkBlue }}
+  //       >
+  //         <div
+  //           className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+  //           style={{ backgroundColor: themeColors.darkBlue }}
+  //         >
+  //           <Shield className="w-8 h-8 text-white" />
+  //         </div>
+  //         <h2 className="text-2xl font-bold mb-2" style={{ color: themeColors.darkBlue }}>
+  //           {getGreeting()}, Super Admin! 🎉
+  //         </h2>
+  //         <p style={{ color: themeColors.darkBlue }}>
+  //           Login successful. Redirecting to dashboard...
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: themeColors.darkBlue }}
+      style={{ backgroundColor: themeColors.white }}
     >
       <div className="w-full max-w-6xl">
         {/* Two Column Layout */}
@@ -147,11 +151,11 @@ export default function SuperAdminLoginPage() {
             <div className="relative w-full max-w-sm">
               <div
                 className="w-96 h-96 rounded-full flex items-center justify-center mx-auto shadow-2xl border-8"
-                style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
+                style={{ backgroundColor: themeColors.darkBlue, borderColor: themeColors.darkBlue }}
               >
                 <div className="text-center">
                   <Image
-                    src="/pg-icon.svg"
+                    src="/pg_logo.png"
                     alt="PG House"
                     width={200}
                     height={200}
@@ -160,12 +164,12 @@ export default function SuperAdminLoginPage() {
                   />
                   <p className="text-white text-2xl font-bold">Welcome</p>
                   <p className="text-orange-100 text-sm mt-2"><span className="font-bold">Super</span> Admin</p>
-                  <p className="text-orange-100 text-sm mt-2 font-bold">Pgthikana</p>
+                  <p className="text-orange-100 text-sm mt-2 font-bold">PG Thikana</p>
                 </div>
               </div>
               <div
                 className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
-                style={{ backgroundColor: themeColors.orange }}
+                style={{ backgroundColor: themeColors.darkBlue }}
               />
               <div
                 className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10"
@@ -182,7 +186,7 @@ export default function SuperAdminLoginPage() {
                 disabled
                 className="flex-1 py-3 px-6 rounded-md font-semibold transition-all"
                 style={{
-                  backgroundColor: themeColors.orange,
+                  backgroundColor: themeColors.darkBlue,
                   color: "white",
                 }}
               >
@@ -204,13 +208,13 @@ export default function SuperAdminLoginPage() {
             {/* Header */}
             <div
               className="text-center mb-8 rounded-3xl p-8 border-4"
-              style={{ backgroundColor: themeColors.orange, borderColor: themeColors.darkBlue }}
+              style={{ backgroundColor: themeColors.darkBlue, borderColor: themeColors.darkBlue }}
             >
               <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center border-4"
                 style={{ backgroundColor: "white", borderColor: themeColors.darkBlue }}
               >
-                <Shield className="w-8 h-8" style={{ color: themeColors.orange }} />
+                <Shield className="w-8 h-8" style={{ color: themeColors.darkBlue }} />
               </div>
               <h1 className="text-4xl font-bold text-white mb-2">
                 Super Admin Login
@@ -245,7 +249,7 @@ export default function SuperAdminLoginPage() {
                     value={formData.username}
                     onChange={handleChange}
                     disabled={loading}
-                    className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300"
+                    className="border-2 focus:border-[#0D5F58] focus:ring-2 focus:ring-[#0D5F58]"
                     style={{ borderColor: borderColor("username") }}
                   />
                   {fieldErrors.username && (
@@ -271,7 +275,7 @@ export default function SuperAdminLoginPage() {
                       value={formData.password}
                       onChange={handleChange}
                       disabled={loading}
-                      className="border-2 focus:border-orange-500 focus:ring-2 focus:ring-orange-300 pr-10"
+                      className="border-2 focus:border-[#0D5F58] focus:ring-2 focus:ring-[#0D5F58] pr-10"
                       style={{ borderColor: borderColor("password") }}
                     />
                     <button
@@ -294,8 +298,8 @@ export default function SuperAdminLoginPage() {
                   type="submit"
                   disabled={loading}
                   className="w-full text-base font-bold rounded-lg py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "white", color: themeColors.orange }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themeColors.lightOrange)}
+                  style={{ backgroundColor: "white", color: themeColors.darkBlue }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = themeColors.grey)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
                 >
                   {loading ? (
@@ -338,7 +342,7 @@ export default function SuperAdminLoginPage() {
                   Back to Home
                 </Link>
               </p>
-              <p className="text-sm text-center font-semibold mt-6" style={{ color: themeColors.orange }}>
+              <p className="text-sm text-center font-semibold mt-6" style={{ color: themeColors.darkBlue }}>
                 Super Admin Portal - Professional Login
               </p>
             </div>

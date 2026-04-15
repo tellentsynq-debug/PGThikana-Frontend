@@ -3,9 +3,18 @@
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  useEffect(() => {
+  // 🔥 CLEAR SUPER ADMIN TOKEN
+  localStorage.removeItem("token");
+
+  // (optional) also clear user if needed
+  localStorage.removeItem("user");
+}, []);
 
   const [form, setForm] = useState({
     username: "",

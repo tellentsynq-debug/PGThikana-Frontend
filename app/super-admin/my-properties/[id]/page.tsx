@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "@/app/context/SnackbarContext";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -8,6 +9,21 @@ export default function PropertyDetailPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [images, setImages] = useState<File[]>([]);
+  const [showEdit, setShowEdit] = useState(false);
+const [formLoading, setFormLoading] = useState(false);
+const [existingImages, setExistingImages] = useState<string[]>([]);
+
+const [form, setForm] = useState({
+  propertyName: "",
+  address: "",
+  description: "",
+  rentPerMonth: "",
+  totalRooms: "",
+  availableRooms: "",
+  bathroomType: "",
+  rules: "",
+});
 
   useEffect(() => {
     if (!property?.images?.length) return;
@@ -47,6 +63,209 @@ export default function PropertyDetailPage() {
     }
   };
 
+  const openEdit = () => {
+    setExistingImages(property.images || []);
+setImages([]); // 🔥 reset new images
+  setForm({
+    propertyName: property.propertyName || "",
+    address: property.address || "",
+    description: property.description || "",
+    rentPerMonth: property.rentPerMonth || "",
+    totalRooms: property.totalRooms || "",
+    availableRooms: property.availableRooms || "",
+    bathroomType: property.bathroomType || "",
+    rules: property.rulesAndRegulations || "",
+  });
+
+setExistingImages(property.images || []);
+setShowEdit(true);
+};
+
+  const handleUnblock = async () => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const res = await fetch(
+      `https://pgthikana.in/api/property/unblock/${id}`, // 🔥 your unblock API
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    console.log("Unblocked:", data);
+
+    toast("Property Unblocked ✅");
+
+    fetchProperty(); // 🔥 refresh UI
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+  const handleBlock = async () => {
+  const token = localStorage.getItem("token");
+
+  const reason = prompt("Enter reason for blocking:");
+
+if (!reason) return;
+
+  try {
+    const res = await fetch(
+      `https://pgthikana.in/api/property/block/${id}`, // ✅ ADD ID HERE
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: reason, // you can make dynamic later
+        }),
+      }
+    );
+
+    const data = await res.json();
+    console.log("Blocked:", data);
+
+    toast("Property Blocked ✅");
+    fetchProperty();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleDelete = async () => {
+  const token = localStorage.getItem("token");
+
+  const reason = prompt("Enter reason for deletion:");
+
+if (!reason) return;
+
+  try {
+    const res = await fetch(
+      `https://pgthikana.in/api/property/remove/${id}`, // ✅ already correct API
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: reason
+        }),
+      }
+    );
+
+    const data = await res.json();
+    console.log("Deleted:", data);
+    fetchProperty();
+
+    toast("Property Deleted 🗑");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleEditSubmit = async () => {
+  try {
+    setFormLoading(true);
+
+    const token = localStorage.getItem("token");
+
+   const formData = new FormData();
+
+// ✅ PROPERTY DETAILS
+formData.append(
+  "propertyDetails",
+  JSON.stringify({
+    propertyName: form.propertyName,
+    address: form.address,
+    description: form.description,
+    rentPerMonth: Number(form.rentPerMonth),
+  })
+);
+
+// ✅ ROOM INFO
+formData.append(
+  "roomInformation",
+  JSON.stringify({
+    totalRooms: Number(form.totalRooms),
+    availableRooms: Number(form.availableRooms),
+    bathroomType: form.bathroomType,
+  })
+);
+
+// ✅ PROPERTY PREFERENCES (🔥 REQUIRED)
+formData.append(
+  "propertyPreferences",
+  JSON.stringify({
+    propertyType: property.propertyType,
+    sharingType: property.sharingType,
+    rentType: "bed",
+    pgCategory: property.pgCategory,
+    place: form.address,
+  })
+);
+
+// ✅ AMENITIES (🔥 REQUIRED)
+formData.append(
+  "amenities",
+  JSON.stringify(property.amenities || [])
+);
+
+formData.append(
+  "existingImages",
+  JSON.stringify(existingImages)
+);
+// ✅ PROPERTY MANAGER (🔥 REQUIRED)
+if (property.propertyManager) {
+  formData.append(
+    "propertyManager",
+    JSON.stringify({
+      managerName: property.propertyManager.managerName,
+      managerPhone: property.propertyManager.managerPhone,
+    })
+  );
+}
+
+// ✅ RULES
+formData.append("rulesAndRegulations", form.rules);
+
+// ✅ EDIT REASON
+formData.append("editReason", "Updated from super admin panel");
+
+// ✅ IMAGES (🔥🔥🔥 IMPORTANT)
+images.forEach((file) => {
+  formData.append("images", file);
+});
+
+    const res = await fetch(
+      `https://pgthikana.in/api/vendor/property/update/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    console.log(data);
+
+    setShowEdit(false);
+    fetchProperty();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setFormLoading(false);
+  }
+};
+
   useEffect(() => {
     fetchProperty();
   }, []);
@@ -77,7 +296,7 @@ export default function PropertyDetailPage() {
   : 0;
 
   return (
-    <div className="min-h-screen bg-gray-100 pl-[80px] md:pl-[60px]">
+    <div className="min-h-screen bg-gray-100 ml-[var(--sidebar-width)] transition-[margin] duration-200 ease-in-out">
 
       {/* ══════════════════════════════════════
           HERO — full-width image slider
@@ -221,13 +440,30 @@ export default function PropertyDetailPage() {
   {/* ACTION BUTTONS (EXTREME RIGHT) */}
 <div className="absolute right-5 top-1/2 -translate-y-1/2 flex gap-2">
 
-  <button className="text-[10px] px-3 py-1 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-300 transition">
-    🚫 Block
-  </button>
+  {property.status === "blocked" ? (
+    <button
+      onClick={handleUnblock}
+      className="text-[10px] px-3 py-1 rounded-full bg-green-500 text-white font-semibold hover:bg-green-600 transition whitespace-nowrap"
+    >
+      ✅ Unblock
+    </button>
+  ) : (
+    <>
+      <button
+        onClick={handleBlock}
+        className="text-[10px] px-3 py-1 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-300 transition whitespace-nowrap"
+      >
+        🚫 Block
+      </button>
 
-  <button className="text-[10px] px-3 py-1 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition">
-    🗑 Delete
-  </button>
+      <button
+        onClick={handleDelete}
+        className="text-[10px] px-3 py-1 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition whitespace-nowrap"
+      >
+        🗑 Delete
+      </button>
+    </>
+  )}
 
 </div>
 </div>
@@ -277,6 +513,61 @@ export default function PropertyDetailPage() {
             </Section>
           )}
 
+   {/* EDIT HISTORY */}
+{property.editHistory && (
+  <Section title="Edit History">
+    <div className="relative border border-gray-100 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white">
+
+      {/* TOP ROW */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+
+          {/* ICON */}
+          <div className="w-8 h-8 rounded-full bg-[#0D5F58]/10 flex items-center justify-center text-[#0D5F58] text-sm font-bold">
+            ✏️
+          </div>
+
+          {/* TITLE */}
+          <div>
+            <p className="text-sm font-semibold text-gray-800">
+              Property Updated
+            </p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+              {property.editHistory.editedByRole === "superadmin"
+                ? "Super Admin"
+                : property.editHistory.editedByRole}
+            </p>
+          </div>
+
+        </div>
+
+        {/* TIME */}
+        <p className="text-xs text-gray-400 font-medium whitespace-nowrap">
+          {new Date(property.editHistory.editedAt).toLocaleString("en-IN")}
+        </p>
+      </div>
+
+      {/* DIVIDER */}
+      <div className="h-px bg-gray-100 mb-3" />
+
+      {/* REASON */}
+      {property.editHistory.editReason && (
+        <div className="flex gap-2">
+
+          {/* LEFT STRIP */}
+          <div className="w-1 rounded-full bg-[#0D5F58]" />
+
+          {/* TEXT */}
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {property.editHistory.editReason}
+          </p>
+        </div>
+      )}
+
+    </div>
+  </Section>
+)}
+
           {/* FOOD MENU */}
           {property.propertyType === "PG" && property.foodMenu?.length > 0 && (
             <Section title="Food Menu">
@@ -287,7 +578,9 @@ export default function PropertyDetailPage() {
                     className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5"
                   >
                     <span className="text-base shrink-0">🍽</span>
-                    <span className="text-xs font-medium text-gray-700 truncate">{item}</span>
+                    <span className="text-xs font-medium text-gray-700">
+  {item.day_of_week} - {item.breakfast}, {item.lunch}, {item.dinner}
+</span>
                   </div>
                 ))}
               </div>
@@ -351,11 +644,157 @@ export default function PropertyDetailPage() {
       </div>
       {/* ✏️ FLOATING EDIT BUTTON */}
 <button
+  onClick={openEdit}
   className="fixed bottom-6 right-6 z-50 bg-[#0D5F58] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#0a4d48] transition flex items-center gap-2"
 >
   ✏️ Edit
 </button>
+
+{showEdit && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div className="bg-white w-[90vw] max-w-5xl max-h-[100vh] overflow-y-auto rounded-2xl p-6 shadow-2xl">
+
+      <h2 className="text-xl font-semibold text-[#0D5F58] mb-4">
+        Edit Property
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <Input label="Property Name" value={form.propertyName} onChange={(v:any)=>setForm({...form,propertyName:v})}/>
+        <Input label="Address" value={form.address} onChange={(v:any)=>setForm({...form,address:v})}/>
+
+        <Input label="Rent" value={form.rentPerMonth} onChange={(v:any)=>setForm({...form,rentPerMonth:v})}/>
+        <Input label="Total Rooms" value={form.totalRooms} onChange={(v:any)=>setForm({...form,totalRooms:v})}/>
+
+        <Input label="Available Rooms" value={form.availableRooms} onChange={(v:any)=>setForm({...form,availableRooms:v})}/>
+        <Input label="Bathroom Type" value={form.bathroomType} onChange={(v:any)=>setForm({...form,bathroomType:v})}/>
+
+       <div className="col-span-2 flex flex-col gap-1">
+  <label className="text-xs font-semibold text-[#0D5F58]">
+    Rules & Regulations
+  </label>
+
+  <textarea
+    value={form.rules}
+    onChange={(e)=>setForm({...form,rules:e.target.value})}
+    className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none"
+  />
+</div>
+
+        <div className="col-span-2">
+  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+    Upload Property Images
+  </label>
+
+  <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#0F766E] hover:bg-gray-50 transition">
+    
+    <span className="text-sm text-gray-500">
+      Click to upload or drag & drop
+    </span>
+    <span className="text-xs text-gray-400 mt-1">
+      JPG, PNG (multiple allowed)
+    </span>
+
+    <input
+      type="file"
+      multiple
+      onChange={(e: any) => setImages([...e.target.files])}
+      className="hidden"
+    />
+
+    
+  </label>
+
+  {images.length > 0 && (
+  <div className="col-span-2 mt-4">
+    <p className="text-sm font-semibold text-gray-700 mb-2">
+      New Images
+    </p>
+
+    <div className="flex flex-wrap gap-3">
+      {images.map((file, i) => (
+        <div
+          key={i}
+          className="relative w-20 h-20 rounded-lg overflow-hidden border"
+        >
+          <img
+            src={URL.createObjectURL(file)}
+            className="w-full h-full object-cover"
+          />
+
+          <button
+            onClick={() =>
+              setImages(images.filter((_, index) => index !== i))
+            }
+            className="absolute top-1 right-1 bg-black/70 text-white text-xs px-1.5 rounded hover:bg-red-500"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
     </div>
+  </div>
+)}
+
+  {existingImages.length > 0 && (
+  <div className="col-span-2 mt-4">
+    <p className="text-sm font-semibold text-gray-700 mb-2">
+      Existing Images
+    </p>
+
+    <div className="flex flex-wrap gap-3">
+      {existingImages.map((img: string, i: number) => (
+  <div
+    key={i}
+    className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200"
+  >
+    <img
+      src={img}
+      className="w-full h-full object-cover"
+    />
+
+    {/* ❌ REMOVE BUTTON */}
+    <button
+      onClick={() =>
+        setExistingImages(existingImages.filter((_, index) => index !== i))
+      }
+      className="absolute top-1 right-1 bg-black/70 text-white text-xs px-1.5 rounded hover:bg-red-500"
+    >
+      ✕
+    </button>
+  </div>
+))}
+    </div>
+  </div>
+)}
+</div>
+
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+
+        <button
+          onClick={()=>setShowEdit(false)}
+          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleEditSubmit}
+          className="px-5 py-2 bg-[#0F766E] text-white rounded-lg"
+        >
+          {formLoading ? "Updating..." : "Save"}
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+    </div>
+
+    
   );
 }
 
@@ -394,6 +833,23 @@ function DetailRow({ label, value }: { label: string; value?: any }) {
       <span className="text-sm text-gray-800 font-semibold text-right">
         {value}
       </span>
+      
+    </div>
+  );
+}
+
+function Input({ label, value, onChange }: any) {
+  return (
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-xs font-semibold text-[#0D5F58]">
+        {label}
+      </label>
+
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none"
+      />
     </div>
   );
 }

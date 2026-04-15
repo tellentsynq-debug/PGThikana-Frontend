@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
+  const [locationFilter, setLocationFilter] = useState("");
+const [typeFilter, setTypeFilter] = useState("");
 
   const router = useRouter();
 
@@ -51,18 +53,69 @@ export default function Page() {
     fetchProperties();
   }, []);
 
+  const filteredProperties = properties.filter((p) => {
+  const matchesLocation =
+    !locationFilter ||
+    p.place?.toLowerCase().includes(locationFilter.toLowerCase());
+
+  const matchesType =
+    !typeFilter ||
+    p.propertyType?.toLowerCase() === typeFilter.toLowerCase();
+
+  return matchesLocation && matchesType;
+});
+
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-teal-50 px-6 py-6 ml-[var(--sidebar-width)] transition-[margin] duration-200 ease-in-out">
       
       <div className="max-w-7xl mx-auto">
       
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">My Properties</h1>
-          <p className="text-gray-500 text-sm">
-            Manage and view all your listed properties
-          </p>
-        </div>
+        <div className="flex items-start justify-between mb-6">
+
+  {/* LEFT: TITLE */}
+  <div>
+    <h1 className="text-3xl font-bold text-gray-800">My Properties</h1>
+    <p className="text-gray-500 text-sm">
+      Manage and view all your listed properties
+    </p>
+  </div>
+
+  {/* RIGHT: FILTERS */}
+<div className="flex gap-3 items-center">
+
+  {/* LOCATION */}
+  <input
+    type="text"
+    placeholder="Search location..."
+    value={locationFilter}
+    onChange={(e) => setLocationFilter(e.target.value)}
+    className="px-4 py-2 rounded-xl 
+    bg-white text-gray-800
+    border border-gray-300
+    shadow-md
+    text-sm w-56
+    focus:outline-none focus:ring-2 focus:ring-teal-500"
+  />
+
+  {/* TYPE */}
+  <select
+    value={typeFilter}
+    onChange={(e) => setTypeFilter(e.target.value)}
+    className="px-4 py-2 rounded-xl 
+    bg-white text-gray-800
+    border border-gray-300
+    shadow-md
+    text-sm
+    focus:outline-none focus:ring-2 focus:ring-teal-500"
+  >
+    <option value="">All</option>
+    <option value="PG">PG</option>
+    <option value="Hostel">Hostel</option>
+    <option value="Room">Room</option>
+  </select>
+
+</div>
+</div>
 
         {/* Loading */}
         {loading && (

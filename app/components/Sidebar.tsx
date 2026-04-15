@@ -2,12 +2,15 @@
 
 import {
   LayoutDashboard,
-  Folder,
-  User,
-  Settings,
-  Shield,
+  ShieldCheck,
   LogOut,
-  Building
+  Building2,
+  MessageSquare,
+  MessageSquareMore,
+  Siren,
+  UserCog,
+  Store,
+  User
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,167 +20,251 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobile, setIsMobile] = useState(false); // ✅ NEW
+  const [role, setRole] = useState<"superadmin" | "admin" | null>(null);
   const [username, setUsername] = useState("");
 
-  const iconGap = "15px";
   const iconSize = 18;
 
-  // 🔥 Sync login state
+  // ✅ Detect screen size
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
+    const adminToken = localStorage.getItem("adminToken");
 
-    setIsLoggedIn(!!token);
-    setUsername(username || "");
+    const user = localStorage.getItem("user");
+
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        setUsername(parsed.name || parsed.username);
+      } catch {
+        setUsername("");
+      }
+    }
+
+    if (token) setRole("superadmin");
+    else if (adminToken) setRole("admin");
+    else setRole(null);
   }, [pathname]);
 
-  // 🔥 CRITICAL FIX: Sync sidebar width globally
-  useEffect(() => {
-    const width = isOpen ? 260 : 60;
+useEffect(() => {
+  // 🚫 DO NOT affect layout on mobile
+  if (isMobile) {
+    document.documentElement.style.setProperty("--sidebar-width", `0px`);
+    return;
+  }
 
-    document.documentElement.style.setProperty(
-      "--sidebar-width",
-      `${width}px`
-    );
-  }, [isOpen]);
+  const width = isOpen ? 260 : 60;
+  document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
+}, [isOpen, isMobile]);
 
   const handleLogout = () => {
     localStorage.clear();
-    setIsLoggedIn(false);
-    setUsername("");
-    router.push("/super-admin/login");
+    setRole(null);
+    router.push("/");
   };
+
+  const superAdminMenu = [
+    { name: "Dashboard", icon: LayoutDashboard, path: "/super-admin/" },
+    { name: "Admin Dashboard", icon: ShieldCheck, path: "/super-admin/admin-dashboard" },
+    { name: "Admin Chat", icon: MessageSquareMore, path: "/super-admin/admin-chat" },
+    { name: "Vendor Chat", icon: MessageSquare, path: "/super-admin/vendor-chat" },
+    { name: "User Complaints", icon: Siren, path: "/super-admin/complaints" },
+    { name: "Admin Credentials", icon: ShieldCheck, path: "/super-admin/admin-credentials" },
+    { name: "Vendor Credentials", icon: UserCog, path: "/super-admin/vendor-credentials" },
+    { name: "My Properties", icon: Building2, path: "/super-admin/my-properties" },
+  ];
+
+  const adminMenu = [
+    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/property" },
+    { name: "Vendor Dashboard", icon: Store, path: "/admin/vendor-dashboard" },
+    { name: "Vendor Chat", icon: MessageSquare, path: "/admin/vendor-chat" },
+    { name: "Properties", icon: Building2, path: "/admin/property" },
+    { name: "User Complaints", icon: Siren, path: "/admin/property/complaints" },
+    { name: "Vendor Credentials", icon: UserCog, path: "/admin/vendor-credentials" },
+  ];
+
+  const menu = role === "superadmin" ? superAdminMenu : adminMenu;
 
   const sidebarWidth = isOpen ? 260 : 60;
 
   return (
-    <div
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      style={{
-        width: sidebarWidth,
-        height: "100vh",
-        backgroundColor: "#0F766E",
-        color: "white",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        zIndex: 1000,
-        transition: "0.3s"
-      }}
-    >
-      {/* LOGO */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "80px",
-  }}
->
-  <img
-    src="/pg_logo.png"
-    alt="Logo"
-    style={{
-      height: isOpen ? "70px" : "40px",
-      width: "auto",
-      objectFit: "contain",
-      transition: "0.3s ease",
-    }}
-  />
-</div>
+    <>
+      {/* ✅ MOBILE TOGGLE BUTTON */}
+      {isMobile && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            position: "fixed",
+top: 20,
+right: 20,
+boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+            zIndex: 10000,
+            background: "#0F766E",
+            color: "white",
+            border: "none",
+            padding: "10px",
+            borderRadius: "8px",
+          }}
+        >
+          ☰
+        </button>
+      )}
 
-      {/* MENU */}
-      <div>
-        <div style={{ display: "flex", flexDirection: "column", gap: isOpen ? iconGap : "30px" }}>
-          
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <LayoutDashboard size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>Dashboard</span>
-          </div>
+      {/* ✅ OVERLAY */}
+      {isMobile && isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 9998,
+          }}
+        />
+      )}
 
-          <div
-            onClick={() => router.push("/super-admin/admin-credentials")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              cursor: "pointer",
-              background:
-                pathname === "/super-admin/admin-credentials"
-                  ? "rgba(255,255,255,0.15)"
-                  : "transparent",
-              borderRadius: "8px"
-            }}
-          >
-            <Shield size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>
-              Admin Credential
-            </span>
-          </div>
-
-          <div
-            onClick={() => router.push("/super-admin/my-properties")}
-            style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
-          >
-            <Building size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>
-              My Properties
-            </span>
-          </div>
-        </div>
-
-        {/* OTHER */}
-        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: isOpen ? iconGap : "30px" }}>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Folder size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>Projects</span>
-          </div>
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <User size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>Profile</span>
-          </div>
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Settings size={isOpen ? iconSize : 30} />
-            <span style={{ display: isOpen ? "inline" : "none" }}>Settings</span>
-          </div>
-        </div>
-      </div>
-
-      {/* USER */}
+      {/* ✅ SIDEBAR */}
       <div
+        onMouseEnter={() => !isMobile && setIsOpen(true)}
+        onMouseLeave={() => !isMobile && setIsOpen(false)}
         style={{
+          width: isMobile ? 260 : sidebarWidth,
+          height: "100vh",
+          backgroundColor: "#0F766E",
+          color: "white",
+          padding: "20px 10px",
           display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          backgroundColor: "#0D5F58",
-          padding: "10px",
-          borderRadius: "10px",
-          opacity: isOpen ? 1 : 0
+          flexDirection: "column",
+          position: "fixed",
+          left: isMobile ? (isOpen ? 0 : -260) : 0, // ✅ KEY FIX
+          top: 0,
+          zIndex: 9999,
+          transition: "all 0.3s ease",
+          overflow: "hidden",
         }}
       >
-        {isLoggedIn ? (
-          <>
-            <div style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: "#0EA5E9" }} />
-            <div>
-              <p>{username || "User"}</p>
-              <p style={{ fontSize: "12px", color: "#94A3B8" }}>PG Admin</p>
+        {/* LOGO */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80px",
+          }}
+        >
+          <img
+            src="/pg_logo.png"
+            alt="Logo"
+            style={{
+              height: isOpen || isMobile ? "70px" : "40px",
+              transition: "0.3s ease",
+            }}
+          />
+        </div>
+
+        {/* MENU */}
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "14px",
+          }}
+        >
+          {menu.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <div
+                key={index}
+                onClick={() => {
+                  router.push(item.path);
+                  if (isMobile) setIsOpen(false); // ✅ close on click
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:
+                    isOpen || isMobile ? "flex-start" : "center",
+                  width: "100%",
+                  maxWidth: "200px",
+                  gap: "10px",
+                  cursor: "pointer",
+                  background:
+                    pathname === item.path
+                      ? "rgba(255,255,255,0.15)"
+                      : "transparent",
+                  borderRadius: "8px",
+                  padding: "10px",
+                }}
+              >
+                <Icon size={isOpen || isMobile ? iconSize : 24} />
+                <span style={{ display: isOpen || isMobile ? "inline" : "none" }}>
+                  {item.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* USER */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            backgroundColor: "#0D5F58",
+            padding: "10px",
+            borderRadius: "10px",
+            opacity: isOpen || isMobile ? 1 : 0,
+          }}
+        >
+          {role ? (
+            <>
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  backgroundColor: "#0EA5E9",
+                }}
+              />
+              <div>
+                <p>{username || "User"}</p>
+                <p style={{ fontSize: "12px", color: "#94A3B8" }}>
+                  {role === "superadmin" ? "Super Admin" : "Admin"}
+                </p>
+              </div>
+              <LogOut
+                size={18}
+                style={{ marginLeft: "auto", cursor: "pointer" }}
+                onClick={handleLogout}
+              />
+            </>
+          ) : (
+            <div onClick={() => router.push("/")} style={{ cursor: "pointer" }}>
+              <User size={18} />
             </div>
-            <LogOut size={18} style={{ marginLeft: "auto", cursor: "pointer" }} onClick={handleLogout} />
-          </>
-        ) : (
-          <div onClick={() => router.push("/super-admin/login")} style={{ cursor: "pointer" }}>
-            <User size={18} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

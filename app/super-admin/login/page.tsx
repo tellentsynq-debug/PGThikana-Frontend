@@ -94,8 +94,9 @@ export default function SuperAdminLoginPage() {
 
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username",data.user.username);
+      localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("role",data.user.role);
+      localStorage.setItem("userId", data.user.id.toString());
       router.push("/super-admin");
     } catch (error) {
       console.error('Network error:', error);

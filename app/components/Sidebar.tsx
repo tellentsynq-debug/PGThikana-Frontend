@@ -10,7 +10,8 @@ import {
   Siren,
   UserCog,
   Store,
-  User
+  User,
+  Heart
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,7 +22,7 @@ export default function Sidebar() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false); // ✅ NEW
-  const [role, setRole] = useState<"superadmin" | "admin" | null>(null);
+  const [role, setRole] = useState<"superadmin" | "admin" | "user" | null>(null);
   const [username, setUsername] = useState("");
 
   const iconSize = 18;
@@ -39,24 +40,27 @@ export default function Sidebar() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const adminToken = localStorage.getItem("adminToken");
+  const superToken = localStorage.getItem("token");
+  const adminToken = localStorage.getItem("adminToken");
+  const userToken = localStorage.getItem("userToken");
 
-    const user = localStorage.getItem("user");
+  const user = localStorage.getItem("user");
 
-    if (user) {
-      try {
-        const parsed = JSON.parse(user);
-        setUsername(parsed.name || parsed.username);
-      } catch {
-        setUsername("");
-      }
+  if (user) {
+    try {
+      const parsed = JSON.parse(user);
+      setUsername(parsed.name || parsed.username);
+    } catch {
+      setUsername("");
     }
+  }
 
-    if (token) setRole("superadmin");
-    else if (adminToken) setRole("admin");
-    else setRole(null);
-  }, [pathname]);
+  if (superToken) setRole("superadmin");
+  else if (adminToken) setRole("admin");
+  else if (userToken) setRole("user"); // ✅ NEW
+  else setRole(null);
+
+}, [pathname]);
 
 useEffect(() => {
   // 🚫 DO NOT affect layout on mobile
@@ -95,7 +99,20 @@ useEffect(() => {
     { name: "Vendor Credentials", icon: UserCog, path: "/admin/vendor-credentials" },
   ];
 
-  const menu = role === "superadmin" ? superAdminMenu : adminMenu;
+  const userMenu = [
+  { name: "Home", icon: LayoutDashboard, path: "/user/home" },
+  { name: "Saved PGs", icon: Heart, path: "/user/home/saved" },
+  { name: "Bookings", icon: Building2, path: "/user/home/bookings" },
+  { name: "Chat", icon: MessageSquare, path: "/user/home/chat" },
+  { name: "Profile", icon: User, path: "/user/home/profile" },
+];
+
+ const menu =
+  role === "superadmin"
+    ? superAdminMenu
+    : role === "admin"
+    ? adminMenu
+    : userMenu;
 
   const sidebarWidth = isOpen ? 260 : 60;
 
@@ -247,10 +264,15 @@ boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
                 }}
               />
               <div>
-                <p>{username || "User"}</p>
-                <p style={{ fontSize: "12px", color: "#94A3B8" }}>
-                  {role === "superadmin" ? "Super Admin" : "Admin"}
-                </p>
+              <p style={{ fontSize: "12px", color: "#94A3B8" }}>
+  {role === "superadmin"
+    ? "Super Admin"
+    : role === "admin"
+    ? "Admin"
+    : role === "user"
+    ? "User"
+    : ""}
+</p>
               </div>
               <LogOut
                 size={18}

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
+
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
 interface Property {
@@ -303,6 +304,8 @@ const managerName =
     ? prop.propertyManager?.managerName
     : prop.propertyManager;
 
+    const router = useRouter();
+
 const safeManagerName = managerName || "Property Manager";
   return (
     <div
@@ -461,20 +464,37 @@ const safeManagerName = managerName || "Property Manager";
         {/* Buttons */}
         <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
           <button
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#0F766E", color: "white", border: "none",
-              padding: "9px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600,
-              cursor: "pointer", flex: 1, fontFamily: "inherit",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#0D6B64")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#0F766E")}
-          >
-            Explore Property
-          </button>
+  onClick={(e) => {
+    e.stopPropagation();
+    router.push("/user");
+  }}
+  style={{
+    background: "#0F766E",
+    color: "white",
+    border: "none",
+    padding: "9px 16px",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer",
+    flex: 1,
+    fontFamily: "inherit",
+    transition: "background 0.2s",
+  }}
+  onMouseEnter={(e) =>
+    (e.currentTarget.style.background = "#0D6B64")
+  }
+  onMouseLeave={(e) =>
+    (e.currentTarget.style.background = "#0F766E")
+  }
+>
+  Explore Property
+</button>
           <button
-            onClick={(e) => e.stopPropagation()}
+             onClick={(e) => {
+    e.stopPropagation();
+    router.push("/user");
+  }}
             style={{
               background: "transparent", color: "#0F766E",
               border: "1.5px solid #0F766E",
@@ -746,16 +766,17 @@ interface FiltersProps {
   sharingTypes: string[];
   budgets: number[];
   activeType: string;
+  filters: Record<string, string>; // ✅ ADD THIS
   onTypeChange: (t: string) => void;
   onFilterChange: (key: string, value: string) => void;
 }
-
 const Filters = ({
   localities,
   categories,
   sharingTypes,
   budgets,
   activeType,
+  filters, // ✅ ADD THIS
   onTypeChange,
   onFilterChange
 }: FiltersProps) => {
@@ -794,69 +815,80 @@ const Filters = ({
       }}>
         {/* Type toggle */}
         <div style={{ display: "flex", background: "#F3F4F6", borderRadius: 8, padding: 3, flexShrink: 0 }}>
-          {["PG / Hostels", "Room"].map((label, i) => {
-            const type = i === 0 ? "pg" : "flat";
-            const isActive = activeType === type;
-            return (
-              <button
-                key={type}
-                onClick={() => onTypeChange(type)}
-                style={{
-                  padding: "6px 14px", borderRadius: 6, fontSize: 13, fontWeight: 500,
-                  border: "none", cursor: "pointer", fontFamily: "inherit",
-                  background: isActive ? "#0F766E" : "transparent",
-                  color: isActive ? "white" : "#6B7280",
-                  transition: "all 0.2s",
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
+          <select
+  style={selectStyle}
+  value={activeType || ""}
+  onChange={(e) => onTypeChange(e.target.value)}
+>
+  <option value="PG">PG</option>
+  <option value="Hostel">Hostel</option>
+  <option value="Room">Room</option>
+</select>
         </div>
 
         <div style={{ width: 1, height: 24, background: "#E5E7EB", flexShrink: 0 }} />
 
-        {/* Locality */}
-        <select style={selectStyle} onChange={(e) => onFilterChange("locality", e.target.value)}>
-          <option value="">Locality</option>
-          {localities.map((loc) => <option key={loc} value={loc}>{loc}</option>)}
-        </select>
+       {/* 🔥 FILTER DROPDOWNS (FULL FIXED + CONSISTENT) */}
+<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
 
-        {/* Budget */}
-<select onChange={(e) => onFilterChange("budget", e.target.value)}>
-  <option value="">Budget</option>
-  {budgets.map((b) => (
-    <option key={b} value={b}>
-      Under ₹{b}
-    </option>
-  ))}
-</select>
+  {/* Locality */}
+  <select
+    style={selectStyle}
+    value={filters.locality || ""}
+    onChange={(e) => onFilterChange("locality", e.target.value)}
+  >
+    <option value="">Locality</option>
+    {localities.map((loc) => (
+      <option key={loc} value={loc}>
+        {loc}
+      </option>
+    ))}
+  </select>
 
-        {/* Gender */}
-<select onChange={(e) => onFilterChange("gender", e.target.value)}>
-  <option value="">Category</option>
-  {categories.map((cat) => (
-    <option key={cat} value={cat}>
-      {cat}
-    </option>
-  ))}
-</select>
+  {/* Budget */}
+  <select
+    style={selectStyle}
+    value={filters.budget || ""}
+    onChange={(e) => onFilterChange("budget", e.target.value)}
+  >
+    <option value="">Budget</option>
+    {budgets.map((b) => (
+      <option key={b} value={b}>
+        Under ₹{b}
+      </option>
+    ))}
+  </select>
 
-        {/* Sharing */}
-        <select onChange={(e) => onFilterChange("sharing", e.target.value)}>
-  <option value="">Sharing Type</option>
-  {sharingTypes.map((s) => (
-    <option key={s} value={s}>
-      {s}
-    </option>
-  ))}
-</select>
+  {/* Category (Gender) */}
+  <select
+    style={selectStyle}
+    value={filters.gender || ""}
+    onChange={(e) => onFilterChange("gender", e.target.value)}
+  >
+    <option value="">Category</option>
+    {categories.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat}
+      </option>
+    ))}
+  </select>
 
-        {/* Sort label */}
-        <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6B7280" }}>
-          <FilterIcon /> Sort: Popularity
-        </div>
+  {/* Sharing */}
+  <select
+    style={selectStyle}
+    value={filters.sharing || ""}
+    onChange={(e) => onFilterChange("sharing", e.target.value)}
+  >
+    <option value="">Sharing Type</option>
+    {sharingTypes.map((s) => (
+      <option key={s} value={s}>
+        {s}
+      </option>
+    ))}
+  </select>
+
+</div>
+       
       </div>
 
       <style>{`
@@ -931,13 +963,38 @@ export default function Page() {
   const [error, setError] = useState(false);
   const [localities, setLocalities] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeType, setActiveType] = useState("pg");
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [activeType, setActiveType] = useState("PG");
+  const [filters, setFilters] = useState({
+  locality: "",
+  budget: "",
+  gender: "",
+  sharing: "",
+}); 
 
     const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
     const [categories, setCategories] = useState<string[]>([]);
     const [sharingTypes, setSharingTypes] = useState<string[]>([]);
     const [budgets, setBudgets] = useState<number[]>([]);
+
+    const router = useRouter();
+
+  useEffect(() => {
+  const vendorToken = localStorage.getItem("vendorToken");
+  const adminToken = localStorage.getItem("adminToken");
+  const superAdminToken = localStorage.getItem("token");
+  const userToken = localStorage.getItem("userToken");
+
+  if (vendorToken) {
+    router.replace("/vendor/dashboard");
+  } else if (adminToken) {
+    router.replace("/admin"); // or your admin route
+  }else if(superAdminToken){
+     router.replace("/super-admin")
+  }
+  else if (userToken) {
+    router.replace("/user/home"); // or your user route
+  }
+}, []);
 
   // Fetch
   useEffect(() => {
@@ -989,9 +1046,44 @@ export default function Page() {
     setLocalities(Array.from(seen));
   };
 
+  const FilterButton = ({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    style={{
+      padding: "6px 14px",
+      borderRadius: 8,
+      fontSize: 13,
+      fontWeight: 500,
+      border: active ? "1px solid #0F766E" : "1px solid #E5E7EB",
+      background: active ? "#0F766E" : "white",
+      color: active ? "white" : "#374151",
+      cursor: "pointer",
+      transition: "all 0.2s",
+    }}
+  >
+    {label}
+  </button>
+);
+
   // Filter logic
   useEffect(() => {
     let result = [...allProperties];
+
+    // 🔥 TYPE FILTER (PG / HOSTEL / ROOM)
+if (activeType) {
+  result = result.filter(
+    (p) =>
+      p.propertyType?.toLowerCase() === activeType.toLowerCase()
+  );
+}
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter((p) =>
@@ -1019,7 +1111,7 @@ export default function Page() {
       );
     }
     setFiltered(result);
-  }, [allProperties, searchQuery, filters]);
+}, [allProperties, searchQuery, filters, activeType]);
 
   const handleSearch = useCallback((q: string) => setSearchQuery(q), []);
 
@@ -1037,6 +1129,7 @@ export default function Page() {
 <Filters
   localities={localities}
   activeType={activeType}
+  filters={filters} // ✅ ADD THIS
   onTypeChange={setActiveType}
   onFilterChange={handleFilterChange}
   categories={categories}
@@ -1108,12 +1201,117 @@ export default function Page() {
       </a>
 
       {/* Footer */}
-      <footer style={{
-        background: "#0F766E", color: "rgba(255,255,255,0.7)",
-        textAlign: "center", padding: "1.2rem", fontSize: 13, marginTop: "2rem",
-      }}>
-        © 2025 <a href="#" style={{ color: "white", fontWeight: 500, textDecoration: "none" }}>PG Thikana</a> — Find your perfect PG, hostel, or flat. All rights reserved.
-      </footer>
+<footer
+  style={{
+    background: "#0F766E",
+    color: "white",
+    marginTop: "3rem",
+    padding: "3rem 1.5rem 1.5rem",
+  }}
+>
+  <div
+    style={{
+      maxWidth: 1200,
+      margin: "0 auto",
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+      gap: "2rem",
+    }}
+  >
+    {/* 🔥 BRAND */}
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <img src="/pg_logo.png" style={{ width: 40 }} />
+        <h2 style={{ fontSize: 20, fontWeight: 700 }}>PG Thikana</h2>
+      </div>
+
+      <p style={{ marginTop: 10, color: "rgba(255,255,255,0.75)", fontSize: 14 }}>
+        Find verified PGs, hostels & flats near you with zero brokerage.
+      </p>
+    </div>
+
+    {/* 🔥 QUICK LINKS */}
+    <div>
+      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>
+        Quick Links
+      </h3>
+
+      {["Home", "Explore", "Saved", "Bookings"].map((item) => (
+        <p
+          key={item}
+          style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,0.7)",
+            marginBottom: 6,
+            cursor: "pointer",
+          }}
+        >
+          {item}
+        </p>
+      ))}
+    </div>
+
+    {/* 🔥 SUPPORT */}
+    <div>
+      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>
+        Support
+      </h3>
+
+      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>
+        📧 support@pgthikana.in
+      </p>
+
+      <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>
+        📞 +91 99999 99999
+      </p>
+    </div>
+
+    {/* 🔥 CTA */}
+    <div>
+      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>
+        For Owners
+      </h3>
+
+      <button
+        onClick={() => window.location.href = "/vendor"}
+        style={{
+          background: "white",
+          color: "#0F766E",
+          border: "none",
+          padding: "10px 16px",
+          borderRadius: 8,
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        List Your Property
+      </button>
+    </div>
+  </div>
+
+  {/* 🔥 BOTTOM BAR */}
+  <div
+    style={{
+      marginTop: "2rem",
+      borderTop: "1px solid rgba(255,255,255,0.2)",
+      paddingTop: "1rem",
+      display: "flex",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+      gap: 10,
+      fontSize: 13,
+      color: "rgba(255,255,255,0.7)",
+    }}
+  >
+    <span>© 2025 PG Thikana. All rights reserved.</span>
+
+    <div style={{ display: "flex", gap: 15 }}>
+      <span style={{ cursor: "pointer" }}>Privacy</span>
+      <span style={{ cursor: "pointer" }}>Terms</span>
+      <span style={{ cursor: "pointer" }}>Cookies</span>
+    </div>
+  </div>
+</footer>
 
       {/* Global responsive styles */}
       <style>{`

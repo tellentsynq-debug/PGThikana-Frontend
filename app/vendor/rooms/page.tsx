@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/app/context/SnackbarContext";
+import { Suspense } from "react";
 
-export default function RoomAmenitiesPage() {
+function RoomAmenitiesPage() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -196,5 +197,13 @@ function Option({ text, selected, onClick }: any) {
     >
       {text}
     </button>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RoomAmenitiesPage />
+    </Suspense>
   );
 }

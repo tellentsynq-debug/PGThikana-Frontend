@@ -103,7 +103,7 @@ const fetchVendors = async (token: string) => {
 
 const createConversation = async () => {
   try {
-    const token = localStorage.getItem("token");
+    
     if (!token) return;
 
     if (!selectedVendor) {
@@ -253,17 +253,25 @@ const createConversation = async () => {
 
   /* ---------------- INIT ---------------- */
  useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+  if (typeof window === "undefined") return;
 
-  fetchChats(token);
-  fetchVendors(token); // 🔥 ADD THIS
+  const storedToken = localStorage.getItem("token");
+  const storedUserId = Number(localStorage.getItem("userId")) || 0;
+
+  if (!storedToken) return;
+
+  setToken(storedToken);
+  setCurrentUserId(storedUserId);
+
+  fetchChats(storedToken);
+  fetchVendors(storedToken);
+
   return () => {
     socket?.disconnect();
   };
 }, []);
-
-const currentUserId = Number(localStorage.getItem("userId"));
+const [currentUserId, setCurrentUserId] = useState(0);
+const [token, setToken] = useState<string | null>(null);
 
   /* ---------------- UI ---------------- */
   return (

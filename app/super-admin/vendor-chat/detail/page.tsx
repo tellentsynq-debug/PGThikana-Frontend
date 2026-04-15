@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import { toast } from "@/app/context/SnackbarContext";
+import { Suspense } from "react";
 
-export default function ChatDetailPage() {
+function ChatDetailPage() {
   const params = useSearchParams();
   const router = useRouter();
 
@@ -327,5 +328,13 @@ export default function ChatDetailPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading chat...</div>}>
+      <ChatDetailPage />
+    </Suspense>
   );
 }

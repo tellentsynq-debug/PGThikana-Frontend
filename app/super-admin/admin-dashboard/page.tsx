@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Select from "react-select";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function AdminPropertiesPage() {
+function AdminDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
 
@@ -264,5 +265,13 @@ function StatCard({
         {value}
       </h2>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminDashboardPage />
+    </Suspense>
   );
 }

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "@/app/context/SnackbarContext";
 import Image from "next/image";
-
-export default function VendorPreferences() {
+import { Suspense } from "react";
+function VendorPreferences() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -188,5 +188,13 @@ function OptionRow({
         </button>
       ))}
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VendorPreferences />
+    </Suspense>
   );
 }

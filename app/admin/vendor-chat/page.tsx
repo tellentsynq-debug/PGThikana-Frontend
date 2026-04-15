@@ -262,13 +262,20 @@ const createConversation = async () => {
   if (!token) return;
 
   fetchChats(token);
-//   fetchVendors(token); // 🔥 ADD THIS
+  fetchVendors(token); // 🔥 ADD THIS
   return () => {
     socket?.disconnect();
   };
 }, []);
 
-const currentUserId = Number(localStorage.getItem("userId")) || 0;
+const [currentUserId, setCurrentUserId] = useState(0);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const id = Number(localStorage.getItem("userId")) || 0;
+    setCurrentUserId(id);
+  }
+}, []);
 
   /* ---------------- UI ---------------- */
   return (

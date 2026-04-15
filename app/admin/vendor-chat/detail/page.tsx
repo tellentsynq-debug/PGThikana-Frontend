@@ -1,23 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import { toast } from "@/app/context/SnackbarContext";
 
-export default function ChatDetailPage() {
+/* ================= WRAPPER (FIXES ERROR) ================= */
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading chat...</div>}>
+      <ChatDetailPage />
+    </Suspense>
+  );
+}
+
+/* ================= MAIN COMPONENT ================= */
+function ChatDetailPage() {
   const params = useSearchParams();
   const router = useRouter();
 
   const conversationId = Number(params.get("conversationId"));
   const userId = Number(params.get("userId"));
   const name = params.get("name") || "User";
-  const currentUserId = Number(localStorage.getItem("userId"));
 
-  const TOKEN =
-    typeof window !== "undefined"
-      ? localStorage.getItem("adminToken")
-      : null;
+  const [currentUserId, setCurrentUserId] = useState(0);
+  const [role, setRole] = useState<string | null>(null);
+  const [TOKEN, setToken] = useState<string | null>(null);
 
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
@@ -31,6 +39,8 @@ export default function ChatDetailPage() {
 
   /* ---------------- FETCH MESSAGES ---------------- */
   const fetchMessages = async () => {
+    if (!TOKEN) return;
+
     const res = await fetch(
       `https://pgthikana.in/api/room/conversation/${conversationId}/messages`,
       {
@@ -39,9 +49,7 @@ export default function ChatDetailPage() {
     );
 
     const data = await res.json();
-    const msgs = data.messages || [];
-
-    setMessages(msgs);
+    setMessages(data.messages || []);
 
     markAsRead();
     scrollToBottom();
@@ -49,6 +57,8 @@ export default function ChatDetailPage() {
 
   /* ---------------- MARK AS READ ---------------- */
   const markAsRead = async () => {
+    if (!TOKEN) return;
+
     await fetch(
       `https://pgthikana.in/api/room/conversation/${conversationId}/read`,
       {
@@ -60,6 +70,8 @@ export default function ChatDetailPage() {
 
   /* ---------------- SOCKET ---------------- */
   const connectSocket = () => {
+    if (!TOKEN) return;
+
     const s = io("https://pgthikana.in", {
       transports: ["websocket"],
       auth: { token: TOKEN },
@@ -70,31 +82,28 @@ export default function ChatDetailPage() {
     });
 
     s.on("receiveMessage", (data: any) => {
-  setMessages((prev) => {
-    const exists = prev.some(
-      (msg) =>
-        (msg.id && msg.id === data.id) ||
-        (msg.createdAt === data.createdAt &&
-          msg.message === data.message)
-    );
+      setMessages((prev) => {
+        const exists = prev.some(
+          (msg) =>
+            msg.id === data.id ||
+            (msg.createdAt === data.createdAt &&
+              msg.message === data.message)
+        );
+        if (exists) return prev;
+        return [...prev, data];
+      });
 
-    if (exists) return prev;
+      setIsTyping(false);
 
-    return [...prev, data];
-  });
+      if ((data.senderId ?? data.sender_id) !== userId) {
+        markAsRead();
+      }
 
-  setIsTyping(false);
-
-  if ((data.senderId ?? data.sender_id) !== userId) {
-    markAsRead();
-  }
-
-  scrollToBottom();
-});
+      scrollToBottom();
+    });
 
     s.on("userTyping", () => {
       setIsTyping(true);
-
       clearTimeout(typingTimeout.current);
       typingTimeout.current = setTimeout(() => {
         setIsTyping(false);
@@ -111,7 +120,7 @@ export default function ChatDetailPage() {
   /* ---------------- SEND MESSAGE ---------------- */
   const sendMessage = async () => {
     if (!input.trim() && !selectedFile) return;
-    if (isSending) return;
+    if (isSending || !TOKEN) return;
 
     setIsSending(true);
 
@@ -127,9 +136,7 @@ export default function ChatDetailPage() {
         `https://pgthikana.in/api/room/conversation/${conversationId}/send-message`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
+          headers: { Authorization: `Bearer ${TOKEN}` },
           body: formData,
         }
       );
@@ -166,6 +173,18 @@ export default function ChatDetailPage() {
 
   /* ---------------- INIT ---------------- */
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const token = localStorage.getItem("adminToken");
+    const userId = Number(localStorage.getItem("userId")) || 0;
+    const role = localStorage.getItem("role");
+
+    setToken(token);
+    setCurrentUserId(userId);
+    setRole(role);
+  }, []);
+
+  useEffect(() => {
     if (!TOKEN) return;
 
     fetchMessages();
@@ -174,120 +193,90 @@ export default function ChatDetailPage() {
     return () => {
       socket?.disconnect();
     };
-  }, []);
+  }, [TOKEN]);
 
   /* ---------------- MESSAGE UI ---------------- */
- const renderMessage = (msg: any, index: number) => {
-  const sender = msg.senderId ?? msg.sender_id;
-  const senderType = msg.sender_type ?? msg.senderType;
+  const renderMessage = (msg: any, index: number) => {
+    const sender = msg.senderId ?? msg.sender_id;
+    const senderType = msg.sender_type ?? msg.senderType;
 
-  const isMe =
-    sender?.toString() === currentUserId.toString();
+    const isMe = sender?.toString() === currentUserId.toString();
 
-  const fileUrl = msg.fileUrl ?? msg.file_url;
+    const fileUrl = msg.fileUrl ?? msg.file_url;
 
-  const isImage =
-    fileUrl &&
-    (fileUrl.endsWith(".jpg") ||
-      fileUrl.endsWith(".png") ||
-      fileUrl.endsWith(".jpeg"));
+    const isImage =
+      fileUrl &&
+      (fileUrl.endsWith(".jpg") ||
+        fileUrl.endsWith(".png") ||
+        fileUrl.endsWith(".jpeg"));
 
-let senderName = "";
-let senderRole = "";
+    let senderName = "";
+    let senderRole = "";
 
-// ✅ YOU
-if (isMe) {
-  senderName = "You";
+    if (isMe) {
+      senderName = "You";
+      senderRole =
+        role === "superadmin"
+          ? "SUPER ADMIN"
+          : role === "admin"
+          ? "ADMIN"
+          : "YOU";
+    } else {
+      switch (senderType) {
+        case "vendor":
+          senderRole = "VENDOR";
+          senderName = name;
+          break;
+        case "user":
+          senderRole = "USER";
+          senderName = name;
+          break;
+        case "admin":
+          senderRole = "ADMIN";
+          senderName = name;
+          break;
+        case "superadmin":
+          senderRole = "SUPER ADMIN";
+          senderName = name;
+          break;
+        default:
+          senderRole = "UNKNOWN";
+          senderName = name;
+      }
+    }
 
-  const myRole = localStorage.getItem("role"); // optional
-  senderRole =
-    myRole === "superadmin"
-      ? "SUPER ADMIN"
-      : myRole === "admin"
-      ? "ADMIN"
-      : "YOU";
-}
-
-// ✅ OTHER PERSON (FIXED PROPERLY)
-else {
-  // 🔥 ROLE FROM API (CORRECT)
-  switch (senderType) {
-    case "vendor":
-      senderRole = "VENDOR";
-      senderName = name; // from params (vendor name)
-      break;
-
-    case "user":
-      senderRole = "USER";
-      senderName = name;
-      break;
-
-    case "admin":
-      senderRole = "ADMIN";
-      senderName = name;
-      break;
-
-    case "superadmin":
-      senderRole = "SUPER ADMIN";
-      senderName = name;
-      break;
-
-    default:
-      senderRole = "UNKNOWN";
-      senderName = name;
-  }
-}
-
-  return (
-    <div
-      key={index}
-      className={`flex ${
-        isMe ? "justify-end" : "justify-start"
-      }`}
-    >
+    return (
       <div
-        className={`max-w-[70%] px-3 py-2 rounded-xl text-sm ${
-          isMe
-            ? "bg-[#0F766E] text-white"
-            : "bg-white text-black"
-        }`}
+        key={index}
+        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
       >
-        {/* ✅ ROLE HEADER */}
-        <div className="text-[10px] opacity-70 mb-1">
-          {senderName} ({senderRole})
+        <div
+          className={`max-w-[70%] px-3 py-2 rounded-xl text-sm ${
+            isMe ? "bg-[#0F766E] text-white" : "bg-white text-black"
+          }`}
+        >
+          <div className="text-[10px] opacity-70 mb-1">
+            {senderName} ({senderRole})
+          </div>
+
+          {fileUrl && isImage && (
+            <img src={fileUrl} className="rounded mb-1 max-h-40" />
+          )}
+
+          {fileUrl && !isImage && (
+            <a href={fileUrl} target="_blank" className="text-blue-500 underline">
+              Open File
+            </a>
+          )}
+
+          {msg.message && <div>{msg.message}</div>}
         </div>
-
-        {/* IMAGE */}
-        {fileUrl && isImage && (
-          <img
-            src={fileUrl}
-            className="rounded mb-1 max-h-40"
-          />
-        )}
-
-        {/* FILE */}
-        {fileUrl && !isImage && (
-          <a
-            href={fileUrl}
-            target="_blank"
-            className="text-blue-500 underline"
-          >
-            Open File
-          </a>
-        )}
-
-        {/* TEXT */}
-        {msg.message && <div>{msg.message}</div>}
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   return (
-<div
-  className="h-screen flex flex-col bg-[#F0F2F5]"
-  style={{ marginLeft: "var(--sidebar-width)" }}
->
+    <div className="h-screen flex flex-col bg-[#F0F2F5]">
       {/* HEADER */}
       <div className="bg-[#0F766E] text-white px-4 py-3 flex items-center gap-3">
         <button onClick={() => router.back()}>←</button>
@@ -298,11 +287,7 @@ else {
 
         <div>
           <div className="text-sm font-semibold">{name}</div>
-          {isTyping && (
-            <div className="text-xs opacity-80">
-              typing...
-            </div>
-          )}
+          {isTyping && <div className="text-xs opacity-80">typing...</div>}
         </div>
       </div>
 
@@ -312,47 +297,18 @@ else {
         <div ref={scrollRef} />
       </div>
 
-      {/* FILE PREVIEW */}
-      {selectedFile && (
-  <div className="mx-3 my-2 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-between">
-    
-    <div className="flex items-center gap-2 text-sm text-gray-800 font-medium truncate">
-      📎
-      <span className="truncate">{selectedFile.name}</span>
-    </div>
-
-    <button
-      onClick={() => setSelectedFile(null)}
-      className="text-gray-500 hover:text-red-500 transition"
-    >
-      ✕
-    </button>
-
-  </div>
-)}
       {/* INPUT */}
       <div className="p-2 bg-white flex items-center gap-2">
-       <label className="cursor-pointer px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700">
-  📎
-  <input
-    type="file"
-    className="hidden"
-    onChange={(e) =>
-      setSelectedFile(e.target.files?.[0] || null)
-    }
-  />
-</label>
-
         <input
           value={input}
           onChange={(e) => handleTyping(e.target.value)}
           placeholder="Type a message"
-          className="flex-1 px-4 py-2 rounded-full bg-white border border-gray-300 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none text-sm text-gray-900 placeholder-gray-400"
+          className="flex-1 px-4 py-2 rounded-full border"
         />
 
         <button
           onClick={sendMessage}
-          className="bg-[#0F766E] text-white px-4 py-2 rounded-full text-sm"
+          className="bg-[#0F766E] text-white px-4 py-2 rounded-full"
         >
           {isSending ? "..." : "Send"}
         </button>

@@ -4,8 +4,9 @@ import { useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/app/context/SnackbarContext";
+import { Suspense } from "react";
 
-export default function PropertyManagerPage() {
+function PropertyManagerPage() {
   const router = useRouter();
   const params = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -203,5 +204,13 @@ function Input({ label, value, setValue }: any) {
         className="w-full mb-5 px-4 py-4 rounded-xl border border-gray-300 bg-white text-[#1A1A1A] outline-none focus:border-[#0F766E]"
       />
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PropertyManagerPage />
+    </Suspense>
   );
 }

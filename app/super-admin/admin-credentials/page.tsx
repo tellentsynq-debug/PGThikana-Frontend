@@ -4,8 +4,9 @@ import { ArrowRightCircle, Contact, LocateIcon, Shield } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "@/app/context/SnackbarContext";
+import { Suspense } from "react";
 
-export default function AdminCredentialPage(){
+function AdminCredentialPage(){
 
     const [form, setForm ] = useState({
         name:"",
@@ -511,4 +512,12 @@ useEffect(() =>{
         </div>
         
     )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminCredentialPage />
+    </Suspense>
+  );
 }

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/app/context/SnackbarContext";
-
-export default function NamePage() {
+import { Suspense } from "react";
+function NamePage() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -111,5 +111,13 @@ export default function NamePage() {
 
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NamePage />
+    </Suspense>
   );
 }

@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/app/context/SnackbarContext";
-export default function OtpPage() {
+import { Suspense } from "react";
+function OtpPage() {
   const router = useRouter();
   const params = useSearchParams();
   const phone = params.get("phone") || "";
@@ -184,5 +185,13 @@ const verifyOtp = async () => {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OtpPage />
+    </Suspense>
   );
 }

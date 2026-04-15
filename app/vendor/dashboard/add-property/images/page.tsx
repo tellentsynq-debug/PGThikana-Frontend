@@ -18,14 +18,22 @@ export default function PropertyImagesPage() {
 
   const [propertyData, setPropertyData] = useState<any>(null);
 
+   const [token, setToken] = useState<string | null>(null);
+
+
 useEffect(() => {
+  if (typeof window === "undefined") return;
+
   const data = localStorage.getItem("propertyData");
+  const token = localStorage.getItem("vendorToken");
+
   if (data) {
     setPropertyData(JSON.parse(data));
   }
+
+  setToken(token);
 }, []);
 
-  const token = localStorage.getItem("vendorToken");
 
   const handleImages = (e: any) => {
     const files = Array.from(e.target.files) as File[];
@@ -76,6 +84,11 @@ const getLocation = () => {
     images.length > 0 && latitude && longitude && rules.trim() !== "";
 const createProperty = async () => {
   if (!canSubmit) return;
+
+  if (!token) {
+  toast("No token found");
+  return;
+}
 
   setLoading(true);
 

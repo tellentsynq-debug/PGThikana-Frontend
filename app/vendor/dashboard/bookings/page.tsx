@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "@/app/context/SnackbarContext";
 
 interface Booking {
   id: number;
@@ -55,7 +56,7 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
 
     if (status === "rejected") {
       if (!rejectReason[id]) {
-        alert("Please enter rejection reason");
+        toast("Please enter rejection reason");
         return;
       }
       body.rejectionReason = rejectReason[id];
@@ -76,7 +77,7 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
     const data = await res.json();
 
     if (data.success) {
-      alert(data.message);
+      toast(data.message);
       fetchBookings(); // refresh
     }
   } catch (e) {

@@ -6,11 +6,23 @@ import io from "socket.io-client";
 
 const API_BASE = "https://pgthikana.in/api";
 
-export default function ChatScreen({ searchParams }: any) {
+export default function ChatScreen() {
   const router = useRouter();
+  const [conversationId, setConversationId] = useState<string | null>(null);
+const [name, setName] = useState("User");
 
-  const conversationId = searchParams?.conversationId;
-  const name = searchParams?.name || "User";
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+
+  const convId = params.get("conversationId");
+  const nameParam = params.get("name");
+
+  setConversationId(convId);
+
+  if (nameParam && nameParam !== "undefined") {
+    setName(decodeURIComponent(nameParam));
+  }
+}, []);
 
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
@@ -27,9 +39,15 @@ export default function ChatScreen({ searchParams }: any) {
 
   /* ================= FETCH ================= */
   useEffect(() => {
+    if (!conversationId) return;
+
     fetchMessages();
-    connectSocket();
-  }, []);
+    const cleanup = connectSocket();
+
+    return () => {
+      cleanup && cleanup();
+    };
+  }, [conversationId]);
 
   const fetchMessages = async () => {
     try {
@@ -137,7 +155,7 @@ export default function ChatScreen({ searchParams }: any) {
         </button>
 
         <div className="w-9 h-9 bg-white text-teal-700 rounded-full flex items-center justify-center font-bold">
-          {name[0].toUpperCase()}
+          {name.charAt(0).toUpperCase()}
         </div>
 
         <p className="font-semibold text-lg">{name}</p>
@@ -230,7 +248,7 @@ export default function ChatScreen({ searchParams }: any) {
 
         <button
           onClick={sendMessage}
-          className="bg-teal-600 text-[#0F766E] px-5 py-2 rounded-full font-semibold hover:bg-teal-700"
+          className="bg-teal-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-teal-700"
         >
           {sending ? "..." : "Send"}
         </button>

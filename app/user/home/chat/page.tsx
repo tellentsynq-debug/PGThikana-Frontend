@@ -100,7 +100,7 @@ export default function ChatListPage() {
       <div className="sticky top-0 z-20 bg-teal-700 text-white px-4 py-3 flex items-center gap-3 shadow-sm">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-black"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-teal-700 text-white"
         >
           ←
         </button>
@@ -114,8 +114,14 @@ export default function ChatListPage() {
       <div className="max-w-4xl mx-auto px-3 py-4 space-y-3">
 
         {conversations.map((chat) => {
-          const name =
-            chat.vendorName || chat.userName || "User";
+          const rawName =
+  chat.vendorName ||
+  chat.userName ||
+  chat.name ||
+  "";
+
+const name =
+  rawName && rawName !== "undefined" ? rawName : "User";
           const lastMessage = chat.lastMessage || "";
           const unread = chat.unreadCount || 0;
           const time = formatTime(chat.lastMessageTime);
@@ -125,7 +131,7 @@ export default function ChatListPage() {
               key={chat.id}
               onClick={() =>
                 router.push(
-  `/user/home/chat/details?conversationId=${chat.id}&name=${encodeURIComponent(name)}`
+  `/user/home/chat/details?conversationId=${chat.id}&name=${encodeURIComponent(name || "User")}`
 )
               }
               className="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer"

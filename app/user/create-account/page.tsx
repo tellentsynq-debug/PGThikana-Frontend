@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "@/app/context/SnackbarContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,11 +44,11 @@ export default function LoginPage() {
         router.push(`/user/otp?phone=${phone}`);
       } else {
         const data = await signupRes.json();
-        alert(data.message || "OTP Failed");
+        toast(data.message || "OTP Failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Network Error");
+      toast("Network Error");
     }
 
     setLoading(false);

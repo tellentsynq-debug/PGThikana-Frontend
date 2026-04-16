@@ -1,15 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function NamePage({ searchParams }: any) {
+export default function NamePage() {
   const router = useRouter();
+const [phone, setPhone] = useState("");
+const [otp, setOtp] = useState("");
 
-  const phone = searchParams?.phone || "";
-  const otp = searchParams?.otp || "";
-
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setPhone(params.get("phone") || "");
+  setOtp(params.get("otp") || "");
+}, []);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState<string | null>(null);
@@ -25,7 +30,13 @@ export default function NamePage({ searchParams }: any) {
     const genderForApi = gender === "Male" ? "male" : "female";
 
     router.push(
-      `/user/preferences?phone=${phone}&otp=${otp}&gender=${genderForApi}&firstName=${firstName}&lastName=${lastName}`
+      `/user/preferences?phone=${encodeURIComponent(
+        phone
+      )}&otp=${encodeURIComponent(
+        otp
+      )}&gender=${genderForApi}&firstName=${encodeURIComponent(
+        firstName
+      )}&lastName=${encodeURIComponent(lastName)}`
     );
   };
 

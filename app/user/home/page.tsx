@@ -280,7 +280,7 @@ export default function Page() {
                 </button>
 
                 {/* RATING */}
-                <div className="absolute bottom-3 left-3 bg-white px-3 py-1 rounded-full text-sm font-semibold shadow">
+                <div className="absolute bottom-3 left-3 bg-white px-3 py-1 rounded-full text-sm text-black font-semibold shadow">
                   ⭐{" "}
                   {p.rating
                     ? p.rating.toFixed(1)

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "@/app/context/SnackbarContext";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -76,7 +77,7 @@ export default function MyBookingsPage() {
 <button
   onClick={() => router.back()}
   className="w-10 h-10 flex items-center justify-center rounded-full 
-             bg-gray-900 text-black shadow-md 
+             bg-black text-white shadow-md 
              hover:bg-black transition"
 >
   <ArrowLeft size={20} />
@@ -163,7 +164,7 @@ export default function MyBookingsPage() {
               <button
                 onClick={() => {
                   router.push(
-                    `/user/report?propertyId=${booking.property_id}`
+                    `/user/home/bookings/report?propertyId=${booking.property_id}`
                   );
                 }}
                 className="w-full border border-red-500 text-red-600 py-3 rounded-xl font-semibold hover:bg-red-50 transition"
@@ -194,10 +195,10 @@ export default function MyBookingsPage() {
 
                     if (res.ok) {
                       router.push(
-                        `/user/chat?conversationId=${data.conversationId}&name=${booking.vendor_name}`
+                        `/user/home/chat?conversationId=${data.conversationId}&name=${booking.vendor_name}`
                       );
                     } else {
-                      alert("Failed to open chat");
+                      toast("Failed to open chat");
                     }
                   } catch (err) {
                     console.error(err);

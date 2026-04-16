@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const API_BASE = "https://pgthikana.in/api";
 
-export default function Page({
-  searchParams,
-}: {
-  searchParams: { bookingId?: string; propertyId?: string };
-}) {
+export default function Page() {
   const router = useRouter();
 
-  const bookingId = searchParams?.bookingId;
-  const propertyId = searchParams?.propertyId;
+  // ✅ store params manually
+  const [propertyId, setPropertyId] = useState<string | null>(null);
 
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -24,6 +20,12 @@ export default function Page({
     typeof window !== "undefined"
       ? localStorage.getItem("userToken")
       : null;
+
+  // 🔥 FIX: read params from window (client only)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setPropertyId(params.get("propertyId"));
+  }, []);
 
   const showToast = (msg: string) => {
     const el = document.createElement("div");
@@ -83,11 +85,11 @@ export default function Page({
   return (
     <div className="min-h-screen bg-white">
 
-      {/* 🔥 HEADER */}
+      {/* HEADER */}
       <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center shadow hover:scale-105 transition"
+          className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center shadow"
         >
           ←
         </button>
@@ -97,10 +99,10 @@ export default function Page({
         </h1>
       </div>
 
-      {/* 🔥 CONTENT */}
+      {/* CONTENT */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
 
-        {/* ⭐ RATING */}
+        {/* RATING */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
             Rate your experience
@@ -113,7 +115,7 @@ export default function Page({
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHover(star)}
                 onMouseLeave={() => setHover(0)}
-                className={`text-3xl transition ${
+                className={`text-3xl ${
                   star <= (hover || rating)
                     ? "text-yellow-500"
                     : "text-gray-300"
@@ -125,7 +127,7 @@ export default function Page({
           </div>
         </div>
 
-        {/* ✍️ REVIEW */}
+        {/* REVIEW */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
             Write your review
@@ -135,19 +137,16 @@ export default function Page({
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder="Share your experience..."
-            className="w-full mt-3 p-4 rounded-xl border border-gray-200 
-                       text-gray-900 placeholder:text-gray-400 
-                       outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            className="w-full mt-3 p-4 rounded-xl border border-gray-200 text-gray-900 outline-none focus:ring-2 focus:ring-teal-500"
             rows={5}
           />
         </div>
 
-        {/* 🚀 SUBMIT */}
+        {/* SUBMIT */}
         <button
           onClick={submitReview}
           disabled={loading}
-          className="w-full h-12 bg-[#0F766E] text-white rounded-xl font-semibold 
-                     shadow-md hover:bg-teal-700 transition active:scale-[0.98] disabled:opacity-60"
+          className="w-full h-12 bg-[#0F766E] text-white rounded-xl font-semibold"
         >
           {loading ? "Submitting..." : "Submit Review"}
         </button>

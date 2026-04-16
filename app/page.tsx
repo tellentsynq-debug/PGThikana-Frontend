@@ -299,14 +299,11 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
   const amenities = (prop.amenities || []).slice(0, 5);
   const rent = prop.rentPerMonth ? formatRent(prop.rentPerMonth) : "On Request";
   
-const managerName =
-  typeof prop.propertyManager === "object"
-    ? prop.propertyManager?.managerName
-    : prop.propertyManager;
+
 
     const router = useRouter();
 
-const safeManagerName = managerName || "Property Manager";
+
   return (
     <div
       style={{
@@ -447,19 +444,31 @@ const safeManagerName = managerName || "Property Manager";
           )}
         </div>
 
-        {/* Manager */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <div style={{
-            width: 26, height: 26, borderRadius: "50%",
-            background: "#CCFBF1", display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 10, fontWeight: 700, color: "#0D6B64", flexShrink: 0,
-          }}>
-            {getInitials(safeManagerName)}
-          </div>
-          <div style={{ fontSize: 12, color: "#6B7280" }}>
-            Managed by <strong style={{ color: "#111827", fontWeight: 500 }}>{safeManagerName}</strong>
-          </div>
-        </div>
+        {/* 🔥 EXTRA DETAILS */}
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: 8,
+  marginBottom: 12,
+}}>
+  <div style={{ fontSize: 12, color: "#6B7280" }}>
+    <strong style={{ color: "#111827" }}>Type:</strong> {prop.propertyType || "-"}
+  </div>
+
+  <div style={{ fontSize: 12, color: "#6B7280" }}>
+    <strong style={{ color: "#111827" }}>Sharing:</strong> {prop.sharingType || "-"}
+  </div>
+
+  <div style={{ fontSize: 12, color: "#6B7280" }}>
+    <strong style={{ color: "#111827" }}>Category:</strong> {prop.pgCategory || "-"}
+  </div>
+
+  <div style={{ fontSize: 12, color: "#6B7280" }}>
+    <strong style={{ color: "#111827" }}>Rooms:</strong> {prop.availableRooms || 0}
+  </div>
+</div>
+
+      
 
         {/* Buttons */}
         <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
@@ -1137,7 +1146,7 @@ if (activeType) {
   budgets={budgets}
 />
       {/* Main 2-column layout */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 380px" }} className="main-layout">
+      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr" }} className="main-layout">
         {/* List Panel */}
         <div style={{ padding: "1.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
@@ -1173,10 +1182,6 @@ if (activeType) {
           </div>
         </div>
 
-        {/* Map Panel */}
-        <div className="map-col">
-         <MapPanel selectedProperty={selectedProperty || filtered[0] || null} />
-        </div>
       </div>
 
       {/* WhatsApp FAB */}

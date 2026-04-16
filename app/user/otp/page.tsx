@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { toast } from "@/app/context/SnackbarContext";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-export default function Page({ searchParams }: any) {
+export default function Page() {
   const router = useRouter();
+const [phone, setPhone] = useState("");
 
-  const phone = searchParams?.phone || "";
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setPhone(params.get("phone") || "");
+}, []);
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputsRef = useRef<HTMLInputElement[]>([]);
@@ -74,11 +79,11 @@ export default function Page({ searchParams }: any) {
       } else if (res.status === 404) {
         router.push(`/user/name?phone=${phone}&otp=${otp.join("")}`);
       } else {
-        alert(data.message || "OTP Failed");
+        toast(data.message || "OTP Failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Network Error");
+      toast("Network Error");
     }
 
     setLoading(false);
@@ -89,9 +94,18 @@ export default function Page({ searchParams }: any) {
 
       <div className="bg-white p-8 rounded-2xl shadow-xl w-[350px]">
 
-        <h1 className="text-xl font-bold text-center text-[#0F766E]">
-          Enter OTP
-        </h1>
+       {/* 🔥 LOGO */}
+<div className="flex justify-center mb-4">
+  <img
+    src="/pg_logo.png"
+    alt="Logo"
+    className="h-16 object-contain"
+  />
+</div>
+
+<h1 className="text-xl font-bold text-center text-[#0F766E]">
+  Enter OTP
+</h1>
 
         <p className="text-center text-gray-500 text-sm mt-2">
           Sent to +91 {phone}

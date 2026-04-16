@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/app/context/SnackbarContext";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -41,10 +42,22 @@ export default function ProfilePage() {
     }
   };
 
-  const logout = () => {
-    localStorage.clear();
-    router.push("/login");
-  };
+const logout = () => {
+  // clear only auth-related data (safer)
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("user");
+
+  // optional: clear everything if you want
+  // localStorage.clear();
+
+  // redirect properly
+  router.replace("/"); // or "/user/create-account"
+
+  // force refresh so sidebar + state reset
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
+};
 
   if (loading) {
     return (
@@ -58,15 +71,15 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white">
 
       {/* 🔥 HEADER */}
-      <div className="bg-black border-b px-4 py-3 flex items-center gap-3">
+      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-gray-900 text-black flex items-center justify-center shadow"
+          className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow"
         >
           ←
         </button>
 
-        <h1 className="text-lg font-semibold text-gray-900">
+        <h1 className="text-lg font-semibold text-black">
           Profile
         </h1>
       </div>
@@ -117,7 +130,7 @@ export default function ProfilePage() {
 
         {/* DOCUMENT */}
         <div
-          onClick={() => router.push("/user/document")}
+          onClick={() => router.push("/user/home/profile/document")}
           className="bg-white rounded-2xl shadow-sm p-5 flex justify-between items-center cursor-pointer hover:bg-gray-50"
         >
           <div className="flex items-center gap-3">
@@ -136,7 +149,7 @@ export default function ProfilePage() {
           <button
             className="w-full flex justify-between items-center px-5 py-4 hover:bg-gray-50"
             onClick={() => {
-              alert("Language change modal (implement if needed)");
+              toast("Language change modal (implement if needed)");
             }}
           >
             <div className="flex items-center gap-3">

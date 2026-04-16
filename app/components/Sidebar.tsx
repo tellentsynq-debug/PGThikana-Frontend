@@ -242,50 +242,55 @@ boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
         </div>
 
         {/* USER */}
+     {/* USER (HIDE FOR NORMAL USER) */}
+{role !== "user" && (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      backgroundColor: "#0D5F58",
+      padding: "10px",
+      borderRadius: "10px",
+      opacity: isOpen || isMobile ? 1 : 0,
+    }}
+  >
+    {role ? (
+      <>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            backgroundColor: "#0D5F58",
-            padding: "10px",
-            borderRadius: "10px",
-            opacity: isOpen || isMobile ? 1 : 0,
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            backgroundColor: "#0EA5E9",
           }}
-        >
-          {role ? (
-            <>
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  backgroundColor: "#0EA5E9",
-                }}
-              />
-              <div>
-              <p style={{ fontSize: "12px", color: "#94A3B8" }}>
-  {role === "superadmin"
-    ? "Super Admin"
-    : role === "admin"
-    ? "Admin"
-    : role === "user"
-    ? "User"
-    : ""}
-</p>
-              </div>
-              <LogOut
-                size={18}
-                style={{ marginLeft: "auto", cursor: "pointer" }}
-                onClick={handleLogout}
-              />
-            </>
-          ) : (
-            <div onClick={() => router.push("/")} style={{ cursor: "pointer" }}>
-              <User size={18} />
-            </div>
-          )}
+        />
+        <div>
+          <p style={{ fontSize: "12px", color: "#94A3B8" }}>
+            {role === "superadmin"
+              ? "Super Admin"
+              : role === "admin"
+              ? "Admin"
+              : ""}
+          </p>
         </div>
+        <LogOut
+          size={18}
+          style={{ marginLeft: "auto", cursor: "pointer" }}
+          onClick={handleLogout}
+        />
+      </>
+    ) : (
+      <div
+        onClick={() => router.push("/")}
+        style={{ cursor: "pointer" }}
+      >
+        <User size={18} />
+      </div>
+    )}
+  </div>
+)}
+     
       </div>
     </>
   );

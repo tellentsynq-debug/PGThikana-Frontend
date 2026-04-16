@@ -67,7 +67,7 @@ export default function SavedPropertiesPage() {
       <div className="sticky top-0 z-20 bg-white border-b px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-gray-100 transition"
+          className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-black transition bg-black text-white"
         >
           ←
         </button>

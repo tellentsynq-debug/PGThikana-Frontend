@@ -1,18 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
+import { toast } from "@/app/context/SnackbarContext";
 
-export default function PreferencePage({ searchParams }: any) {
+export default function PreferencePage() {
   const router = useRouter();
+const [phone, setPhone] = useState("");
+const [otp, setOtp] = useState("");
+const [gender, setGenderParam] = useState("");
+const [firstName, setFirstNameParam] = useState("");
+const [lastName, setLastNameParam] = useState("");
 
-  const phone = searchParams?.phone || "";
-  const otp = searchParams?.otp || "";
-  const gender = searchParams?.gender || "";
-  const firstName = searchParams?.firstName || "";
-  const lastName = searchParams?.lastName || "";
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
 
+  setPhone(params.get("phone") || "");
+  setOtp(params.get("otp") || "");
+  setGenderParam(params.get("gender") || "");
+  setFirstNameParam(params.get("firstName") || "");
+  setLastNameParam(params.get("lastName") || "");
+}, []);
   const [place, setPlace] = useState<string | null>(null);
   const [propertyType, setPropertyType] = useState<string | null>(null);
   const [sharing, setSharing] = useState<string | null>(null);
@@ -60,14 +70,14 @@ export default function PreferencePage({ searchParams }: any) {
       const data = await res.json();
 
       if (res.status === 200 || res.status === 201) {
-        localStorage.setItem("token", data.token);
-        router.push("/home");
+        localStorage.setItem("userToken", data.token); // ✅ FIXED TOKEN KEY
+        router.push("/user/home"); // ✅ FIXED ROUTE
       } else {
-        alert(data.message || "Signup failed");
+        toast(data.message || "Signup failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Network error");
+      toast("Network error");
     }
 
     setLoading(false);
@@ -185,12 +195,21 @@ export default function PreferencePage({ searchParams }: any) {
             Upload Profile Image
           </label>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImage}
-            className="mt-2 text-black"
-          />
+          {/* 🔥 CUSTOM FILE UPLOAD */}
+<label className="mt-2 block cursor-pointer">
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImage}
+    className="hidden"
+  />
+
+  <div className="w-full h-12 flex items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-600 hover:border-[#0F766E] hover:text-[#0F766E] transition">
+    Upload Profile Image
+  </div>
+
+</label>
 
           {image && (
             <img

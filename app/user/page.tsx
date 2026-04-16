@@ -13,12 +13,7 @@ export default function Page() {
       <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-[#0F766E]/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-[-120px] right-[-100px] w-[300px] h-[300px] bg-[#0F766E]/10 rounded-full blur-3xl"></div>
 
-      {/* 🔹 TOP BAR */}
-      <div className="flex justify-end p-6 relative z-10">
-        <div className="w-10 h-10 rounded-full bg-black/80 text-white flex items-center justify-center text-sm font-semibold shadow-md">
-          N
-        </div>
-      </div>
+   
 
       {/* 🔹 CENTER SECTION */}
       <div className="flex flex-1 flex-col items-center justify-center px-6 relative z-10">

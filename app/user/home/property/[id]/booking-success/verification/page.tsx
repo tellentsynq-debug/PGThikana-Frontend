@@ -57,13 +57,24 @@ export default function TenantVerificationPage() {
 
     if (res.status === 200 && data.success) {
       setOtpSent(true);
-
-      const otp = prompt("Enter OTP");
-      if (otp) verifyOtp(otp);
+setShowOtpDialog(true);
     } else {
       toast(data.message || "Error");
     }
   };
+
+  const [otpInput, setOtpInput] = useState("");
+const [showOtpDialog, setShowOtpDialog] = useState(false);
+
+const handleOtpSubmit = () => {
+  if (!otpInput) {
+    toast("Enter OTP");
+    return;
+  }
+
+  verifyOtp(otpInput);
+  setShowOtpDialog(false);
+};
 
   const verifyOtp = async (otp: string) => {
     const res = await fetch(
@@ -154,70 +165,114 @@ export default function TenantVerificationPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#F5F7F9] p-4">
+return (
+  <div className="min-h-screen bg-[#F5F7F9] p-4 text-black">
+    <div className="max-w-md mx-auto space-y-4">
 
-      <div className="max-w-md mx-auto space-y-4">
+      <h1 className="text-xl font-bold text-black">
+        Tenant Verification
+      </h1>
 
-        <h1 className="text-xl font-bold">Tenant Verification</h1>
+      {/* PERSONAL */}
+      <Section title="Personal Information">
+        <Input value={name} setValue={setName} placeholder="Full Name" />
+        <Input value={email} setValue={setEmail} placeholder="Email" />
+        <Input value={address} setValue={setAddress} placeholder="Address" />
+      </Section>
 
-        {/* PERSONAL */}
-        <Section title="Personal Information">
-          <Input value={name} setValue={setName} placeholder="Full Name" />
-          <Input value={email} setValue={setEmail} placeholder="Email" />
-          <Input value={address} setValue={setAddress} placeholder="Address" />
-        </Section>
+      {/* ID */}
+      <Section title="Identity Information">
+        <Input value={pan} setValue={setPan} placeholder="PAN Card" />
 
-        {/* ID */}
-        <Section title="Identity Information">
-          <Input value={pan} setValue={setPan} placeholder="PAN Card" />
+        <Input
+          value={emergency}
+          setValue={setEmergency}
+          placeholder="Emergency Number"
+          disabled={otpVerified}
+        />
 
-          <Input
-            value={emergency}
-            setValue={setEmergency}
-            placeholder="Emergency Number"
-            disabled={otpVerified}
-          />
-
-          <select
-            value={relation}
-            onChange={(e) => setRelation(e.target.value)}
-            disabled={otpVerified}
-            className="w-full p-3 rounded-lg bg-white border"
-          >
-            <option value="">Select Relation</option>
-            <option value="mother">Mother</option>
-            <option value="father">Father</option>
-            <option value="friend">Friend</option>
-          </select>
-
-          <button
-            onClick={sendOtp}
-            disabled={otpSent}
-            className="w-full bg-teal-600 text-white py-2 rounded-lg"
-          >
-            {otpSent ? "OTP Sent" : "Send OTP"}
-          </button>
-        </Section>
-
-        {/* UPLOAD */}
-        <Section title="Upload Aadhaar">
-          <Upload label="Front" onChange={(e:any)=>handleFile(e,true)} file={aadharFront}/>
-          <Upload label="Back" onChange={(e:any)=>handleFile(e,false)} file={aadharBack}/>
-        </Section>
-
-        {/* SUBMIT */}
-        <button
-          onClick={submitVerification}
-          disabled={!otpVerified || submitting}
-          className="w-full bg-teal-600 text-white py-3 rounded-lg font-semibold"
+        <select
+          value={relation}
+          onChange={(e) => setRelation(e.target.value)}
+          disabled={otpVerified}
+          className="w-full p-3 rounded-lg bg-white border text-black"
         >
-          Submit Verification
+          <option value="">Select Relation</option>
+          <option value="mother">Mother</option>
+          <option value="father">Father</option>
+          <option value="friend">Friend</option>
+        </select>
+
+        <button
+          onClick={sendOtp}
+          disabled={otpSent}
+          className="w-full bg-teal-600 text-white py-2 rounded-lg"
+        >
+          {otpSent ? "OTP Sent" : "Send OTP"}
+        </button>
+      </Section>
+
+      {/* UPLOAD */}
+      <Section title="Upload Aadhaar">
+        <Upload
+          label="Front"
+          onChange={(e: any) => handleFile(e, true)}
+          file={aadharFront}
+        />
+        <Upload
+          label="Back"
+          onChange={(e: any) => handleFile(e, false)}
+          file={aadharBack}
+        />
+      </Section>
+
+      {/* SUBMIT */}
+      <button
+        onClick={submitVerification}
+        disabled={!otpVerified || submitting}
+        className="w-full bg-teal-600 text-white py-3 rounded-lg font-semibold"
+      >
+        Submit Verification
+      </button>
+
+    </div>
+
+    {showOtpDialog && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl w-[90%] max-w-sm space-y-4 shadow-lg">
+
+      <h2 className="text-lg font-semibold text-black">
+        Enter OTP
+      </h2>
+
+      <input
+        value={otpInput}
+        onChange={(e) => setOtpInput(e.target.value)}
+        placeholder="Enter OTP"
+        className="w-full p-3 border rounded-lg text-black bg-white"
+      />
+
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowOtpDialog(false)}
+          className="w-full border rounded-lg py-2"
+        >
+          Cancel
         </button>
 
+        <button
+          onClick={handleOtpSubmit}
+          className="w-full bg-teal-600 text-white rounded-lg py-2"
+        >
+          Verify
+        </button>
       </div>
+
     </div>
-  );
+  </div>
+)}
+  </div>
+);
 }
 
 /* 🔹 COMPONENTS */
@@ -238,7 +293,7 @@ function Input({ value, setValue, placeholder, disabled }: any) {
       onChange={(e) => setValue(e.target.value)}
       placeholder={placeholder}
       disabled={disabled}
-      className="w-full p-3 rounded-lg border"
+      className="w-full p-3 rounded-lg border bg-white text-black placeholder-gray-500 placeholder-opacity-100"
     />
   );
 }

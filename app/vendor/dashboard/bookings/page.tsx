@@ -78,7 +78,30 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
 
     if (data.success) {
       toast(data.message);
-      fetchBookings(); // refresh
+      // 🔥 Save in localStorage
+const existing =
+  JSON.parse(localStorage.getItem("docStatus") || "{}");
+
+existing[id] = {
+  status,
+  reason: status === "rejected" ? rejectReason[id] : "",
+};
+
+localStorage.setItem("docStatus", JSON.stringify(existing));
+
+// 🔥 update UI instantly
+setBookings((prev) =>
+  prev.map((b) =>
+    b.id === id
+      ? {
+          ...b,
+          document_status: status,
+          rejectionReason:
+            status === "rejected" ? rejectReason[id] : "",
+        }
+      : b
+  )
+); // refresh
     }
   } catch (e) {
     console.error(e);
@@ -105,7 +128,16 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
       const data = await res.json();
 
       if (data.success) {
-        setBookings(data.bookings);
+        const savedStatus =
+  JSON.parse(localStorage.getItem("docStatus") || "{}");
+
+const updatedBookings = data.bookings.map((b: any) => ({
+  ...b,
+  document_status: savedStatus[b.id]?.status || "pending",
+  rejectionReason: savedStatus[b.id]?.reason || "",
+}));
+
+setBookings(updatedBookings);
       }
     } catch (e) {
       console.error("Booking error:", e);
@@ -161,8 +193,8 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
         <div className="space-y-6">
           {bookings.map((b) => {
   // ✅ DEFINE HERE (IMPORTANT FIX)
-  const isVerified = b.booking_status === "confirmed"; // temp mapping
-  const isRejected = false;
+const isVerified = b.document_status === "approved";
+const isRejected = b.document_status === "rejected";
 
   return (
     <div
@@ -317,7 +349,7 @@ const handleVerify = async (id: number, status: "approved" | "rejected") => {
                   [b.id]: e.target.value,
                 }))
               }
-              className="w-full mb-3 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+              className="w-full mb-3 px-3 py-2 border rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
             />
 
             <div className="flex gap-3">

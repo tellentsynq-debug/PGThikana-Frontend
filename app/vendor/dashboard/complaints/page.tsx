@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function ComplaintsPage() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
+
+  const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
+const [replyLoading, setReplyLoading] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -35,18 +42,77 @@ export default function ComplaintsPage() {
     fetchComplaints();
   }, []);
 
+
+  const handleReply = async (complaintId: number) => {
+  try {
+    const token = localStorage.getItem("vendorToken");
+
+    if (!replyText[complaintId]) return alert("Enter reply first");
+
+    setReplyLoading((prev) => ({ ...prev, [complaintId]: true }));
+
+    const res = await fetch(
+      `https://pgthikana.in/api/complaint/${complaintId}/reply`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reply: replyText[complaintId],
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    // update UI instantly
+    setComplaints((prev) =>
+      prev.map((c) =>
+        c.id === complaintId
+          ? { ...c, vendor_reply: replyText[complaintId] }
+          : c
+      )
+    );
+
+    // clear input
+    setReplyText((prev) => ({ ...prev, [complaintId]: "" }));
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to send reply");
+  } finally {
+    setReplyLoading((prev) => ({ ...prev, [complaintId]: false }));
+  }
+};
+
   return (
     <div className="min-h-screen bg-gray-50 ml-[var(--sidebar-width)] px-10 py-8">
 
       {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900">
-          Complaints
-        </h1>
-        <p className="text-gray-500 text-sm">
-          Manage all user complaints
-        </p>
-      </div>
+     <div className="flex items-center gap-3 mb-8">
+
+  {/* BACK BUTTON */}
+  <button
+    onClick={() => router.back()}
+    className="w-9 h-9 flex items-center justify-center rounded-full bg-[#0D5F58] text-white hover:bg-[#0a4c47] transition"
+  >
+    <ArrowLeft size={18} />
+  </button>
+
+  <div>
+    <h1 className="text-3xl font-semibold text-gray-900">
+      Complaints
+    </h1>
+    <p className="text-gray-500 text-sm">
+      Manage all user complaints
+    </p>
+  </div>
+
+</div>
 
       {/* LOADING */}
       {loading && (
@@ -119,15 +185,38 @@ export default function ComplaintsPage() {
 
             {/* REPLY */}
             {c.vendor_reply ? (
-              <div className="bg-white/10 p-3 rounded-lg text-sm">
-                <span className="font-semibold">Vendor Reply:</span>{" "}
-                {c.vendor_reply}
-              </div>
-            ) : (
-              <div className="text-xs text-red-200">
-                No reply from vendor yet
-              </div>
-            )}
+  <div className="bg-white/10 p-3 rounded-lg text-sm">
+    <span className="font-semibold">Vendor Reply:</span>{" "}
+    {c.vendor_reply}
+  </div>
+) : (
+  <div>
+    <textarea
+  placeholder="Write your reply..."
+  rows={2}
+  value={replyText[c.id] || ""}
+  onChange={(e) =>
+    setReplyText((prev) => ({
+      ...prev,
+      [c.id]: e.target.value,
+    }))
+  }
+  className="w-full p-2 rounded-lg text-sm mb-2 
+             bg-white/90 text-gray-800 
+             border border-white/30 
+             focus:outline-none focus:ring-2 focus:ring-white 
+             placeholder:text-gray-400"
+/>
+
+    <button
+      onClick={() => handleReply(c.id)}
+      disabled={replyLoading[c.id]}
+      className="bg-white text-[#0D5F58] px-4 py-1 rounded-lg text-sm font-medium hover:bg-gray-200 transition"
+    >
+      {replyLoading[c.id] ? "Sending..." : "Reply"}
+    </button>
+  </div>
+)}
 
           </div>
         ))}

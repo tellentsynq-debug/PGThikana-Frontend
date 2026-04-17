@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 /* ─── Types ─── */
 interface Property {
-  id: number;
+  _id: string;
   propertyName: string;
   place: string;
   totalRooms: number;
@@ -148,10 +148,10 @@ setFiltered(temp);
 
             {filtered.map((p) => (
               <PropertyCard
-                key={p.id}
+                key={p._id}
                 property={p}
                 onClick={() =>
-                  router.push(`/vendor/dashboard/property/${p.id}`)
+                  router.push(`/vendor/dashboard/property/${p._id}`)
                 }
               />
             ))}

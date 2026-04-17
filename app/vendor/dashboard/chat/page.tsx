@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import { toast } from "@/app/context/SnackbarContext";
+import { ArrowLeft } from "lucide-react";
 
 
 type Chat = {
@@ -185,9 +186,21 @@ return (
   <div className="min-h-screen bg-[#F0F2F5]">
     
     {/* HEADER */}
-    <div className="bg-[#0F766E] text-white px-5 py-4 text-lg font-semibold shadow">
-      Chats
-    </div>
+   <div className="bg-[#0F766E] text-white px-5 py-4 flex items-center gap-3 shadow">
+
+  {/* BACK BUTTON */}
+  <button
+    onClick={() => router.back()}
+    className="w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition"
+  >
+    <ArrowLeft size={18} />
+  </button>
+
+  <span className="text-lg font-semibold">
+    Chats
+  </span>
+
+</div>
 
     {/* CHAT LIST */}
     <div className="px-3 py-3 space-y-2">

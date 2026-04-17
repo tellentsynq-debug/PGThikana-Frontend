@@ -49,7 +49,7 @@ export default function Sidebar() {
   if (user) {
     try {
       const parsed = JSON.parse(user);
-      setUsername(parsed.name || parsed.username);
+      setUsername(parsed.username);
     } catch {
       setUsername("");
     }
@@ -265,15 +265,18 @@ boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
             backgroundColor: "#0EA5E9",
           }}
         />
-        <div>
-          <p style={{ fontSize: "12px", color: "#94A3B8" }}>
-            {role === "superadmin"
-              ? "Super Admin"
-              : role === "admin"
-              ? "Admin"
-              : ""}
-          </p>
-        </div>
+      <div>
+  <p style={{ fontSize: "14px", fontWeight: "600" }}>
+    {username}
+  </p>
+  <p style={{ fontSize: "12px", color: "#94A3B8" }}>
+    {role === "superadmin"
+      ? "Super Admin"
+      : role === "admin"
+      ? "Admin"
+      : ""}
+  </p>
+</div>
         <LogOut
           size={18}
           style={{ marginLeft: "auto", cursor: "pointer" }}

@@ -8,7 +8,7 @@ import { toast } from "@/app/context/SnackbarContext";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Property {
-  _id: string;
+  id: number;
   propertyName: string;
   place: string;
   totalRooms: number;
@@ -167,7 +167,7 @@ export default function DashboardPage() {
     const property = myProperties[0]; // 👉 you can improve later
 
     // 🔥 STORE DATA
-    localStorage.setItem("propertyId", property._id);
+    localStorage.setItem("propertyId", property.id.toString());
     localStorage.setItem(
       "foodMenu",
       JSON.stringify(property.foodMenu || [])
@@ -231,8 +231,14 @@ export default function DashboardPage() {
   ) : (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {myProperties.slice(0, 2).map((p) => (
-        <PropertyCard key={p._id} property={p} />
-      ))}
+  <PropertyCard
+    key={p.id}
+    property={p}
+    onClick={() =>
+      router.push(`/vendor/dashboard/property/${p.id}`)
+    }
+  />
+))}
     </div>
   )}
 </section>
@@ -314,7 +320,13 @@ function QuickAction({
 
 // ─── Property Card ────────────────────────────────────────────────────────────
 
-function PropertyCard({ property }: { property: Property }) {
+function PropertyCard({
+  property,
+  onClick,
+}: {
+  property: Property;
+  onClick: () => void;
+}) {
   const total = property.totalRooms || 0;
   const available = property.availableRooms || 0;
   const occupied = total - available;
@@ -328,7 +340,10 @@ function PropertyCard({ property }: { property: Property }) {
       : "bg-[#f59e0b]";
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-pointer group">
+    <div
+  onClick={onClick}
+  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-pointer group"
+>
       {/* Image */}
       <div className="relative h-40 bg-gray-100 overflow-hidden">
         {property.images?.[0] ? (

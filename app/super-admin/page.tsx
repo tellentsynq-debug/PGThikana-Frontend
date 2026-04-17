@@ -48,6 +48,8 @@ export default function AdminDashboard(): JSX.Element {
       localStorage.removeItem("adminToken");
   const token = localStorage.getItem("token");
 
+  
+
   if (!token) {
     router.push("/super-admin/login");
   }
@@ -248,7 +250,7 @@ const cityOptions = Array.from(
     }),
     input: (base) => ({
       ...base,
-      color: "white",
+      color: "black"
     }),
     placeholder: (base) => ({
       ...base,

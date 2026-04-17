@@ -660,21 +660,32 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
 
       {/* Nav buttons */}
       <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexShrink: 0 }}>
-        {["Login", "List Property"].map((label) => (
-          <button key={label} 
-          onClick={() => router.push("/vendor")}
-          style={{
-            background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)",
-            color: "white", padding: "7px 14px", borderRadius: 7,
-            fontSize: 13, fontFamily: "inherit", fontWeight: 500, cursor: "pointer",
-            
-            
-          }}>
-            {label}
-            
-          </button>
-        ))}
-      </div>
+  {["Login", "List Property"].map((label) => (
+    <button
+      key={label}
+      onClick={() => {
+        if (label === "Login") {
+          router.push("/user");
+        } else {
+          router.push("/vendor");
+        }
+      }}
+      style={{
+        background: "rgba(255,255,255,0.15)",
+        border: "1px solid rgba(255,255,255,0.3)",
+        color: "white",
+        padding: "7px 14px",
+        borderRadius: 7,
+        fontSize: 13,
+        fontFamily: "inherit",
+        fontWeight: 500,
+        cursor: "pointer",
+      }}
+    >
+      {label}
+    </button>
+  ))}
+</div>
     </nav>
   );
 };
@@ -730,10 +741,19 @@ const Hero = () => {
         </p>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button style={{
+          <button
+
+          onClick={(e) => {
+    e.stopPropagation();
+    router.push("/user");
+  }}
+          
+          style={{
+            
             background: "white", color: "#0F766E", fontWeight: 600, fontSize: 14,
             padding: "11px 22px", borderRadius: 8, border: "none", cursor: "pointer",
           }}>
+            
             Explore Listings
           </button>
 

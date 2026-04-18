@@ -42,6 +42,53 @@ export default function AdminDashboard(): JSX.Element {
   new Date().toISOString().split("T")[0]
 );
 
+
+const [totalProperties, setTotalProperties] = useState(0);
+
+
+const fetchPropertyCount = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      "https://pgthikana.in/api/property/my-properties",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    const filteredProperties = (data.properties || []).filter((p: any) => {
+
+      const matchCity = cityFilter
+        ? p.place?.toLowerCase().includes(cityFilter.toLowerCase())
+        : true;
+
+      const matchDate = dateFilter
+        ? new Date(p.createdAt).toISOString().split("T")[0] === dateFilter
+        : true;
+
+      return matchCity && matchDate;
+    });
+
+    // ✅ FINAL COUNT (DYNAMIC)
+    setTotalProperties(filteredProperties.length);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+useEffect(() => {
+  fetchPropertyCount();
+}, [cityFilter, dateFilter]);
+
+
   const router = useRouter();
 
     useEffect(() => {
@@ -106,8 +153,7 @@ useEffect(() => {
     : true;
 
   const matchDate = dateFilter
-    ? new Date(c.created_at).toDateString() ===
-      new Date(dateFilter).toDateString()
+    ? new Date(c.created_at).toISOString().split("T")[0] === dateFilter
     : true;
 
   return matchCity && matchDate;
@@ -127,8 +173,7 @@ setTotalComplaints(filteredComplaints.length); // ✅ USE API COUNTsetTotalCompl
   : true;
 
     const matchDate = dateFilter
-      ? new Date(b.created_at).toDateString() ===
-        new Date(dateFilter).toDateString()
+      ? new Date(b.created_at).toISOString().split("T")[0] === dateFilter
       : true;
 
     return matchCity && matchDate;
@@ -158,10 +203,10 @@ setTotalComplaints(filteredComplaints.length); // ✅ USE API COUNTsetTotalCompl
   // 🔥 HARDCODED (as you asked)
   const [totalComplaints, setTotalComplaints] = useState(0);
 
+  
+
   // ⚠️ No property API → simulate for now
-  const totalProperties = new Set(
-    bookings.map((b) => b.property_name)
-  ).size;
+
 
   /* ================= CHART DATA ================= */
 
@@ -293,7 +338,7 @@ const cityOptions = Array.from(
 >
   <StatCard title="Complaints" value={totalComplaints} />
 </div>
-        <StatCard title="Total Property" value={totalProperties} />
+        <StatCard title="Property Created" value={totalProperties} />
 
       </div>
 

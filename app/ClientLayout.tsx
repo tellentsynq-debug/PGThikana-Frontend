@@ -24,13 +24,19 @@ export default function ClientLayout({
     return () => window.removeEventListener("storage", checkToken);
   }, []);
 
-  // 🔥 SHOW SIDEBAR ONLY WHEN LOGGED IN
-  const showSidebar = hasUserToken;
+  // ✅ ROUTES WHERE SIDEBAR SHOULD NOT SHOW
+  const hideSidebarRoutes = ["/"];
+
+  // ✅ FINAL LOGIC
+  const showSidebar =
+    hasUserToken && !hideSidebarRoutes.includes(pathname);
 
   return (
     <div>
+      {/* ✅ SIDEBAR */}
       {showSidebar && <Sidebar />}
 
+      {/* ✅ MAIN CONTENT */}
       <div
         style={{
           marginLeft: showSidebar ? "var(--sidebar-width)" : "0px",

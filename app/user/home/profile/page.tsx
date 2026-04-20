@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/app/context/SnackbarContext";
+import { ArrowBigLeftIcon, ArrowLeft } from "lucide-react";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -83,9 +84,9 @@ const logout = () => {
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow"
+          className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow"
         >
-          ←
+          <ArrowLeft></ArrowLeft>
         </button>
 
         <h1 className="text-lg font-semibold text-black">

@@ -22,6 +22,8 @@ interface Property {
 };
   description?: string;
   place?: string;
+    bathroomType?: string;
+  rulesAndRegulations?: string;
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -483,10 +485,38 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
         {/* Buttons */}
         <div className="card-buttons" style={{ display: "flex", gap: 8, marginTop: "auto" }}>
           <button
-  onClick={(e) => {
-    e.stopPropagation();
+onClick={(e) => {
+  e.stopPropagation();
+
+  const token = localStorage.getItem("userToken");
+
+  if (token) {
+const mappedProp = {
+  id: prop.id,
+  property_name: prop.propertyName,
+  address: prop.address,
+  rent_per_month: prop.rentPerMonth,
+  sharing_type: prop.sharingType,
+  property_type: prop.propertyType,
+  pg_category: prop.pgCategory,
+  total_rooms: prop.availableRooms,
+  available_rooms: prop.availableRooms,
+  bathroom_type: prop.bathroomType || "",
+  description: prop.description || "",
+  rulesAndRegulations: prop.rulesAndRegulations || "",
+  amenities: prop.amenities || [],
+  images: prop.images || [],
+  propertyManager: prop.propertyManager || {},
+};
+router.push(
+  `/user/home/property/${prop.id}?data=${encodeURIComponent(
+    JSON.stringify(mappedProp)
+  )}`
+);
+  } else {
     router.push("/user");
-  }}
+  }
+}}
   style={{
     background: "#0F766E",
     color: "white",
@@ -512,7 +542,34 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
           <button
              onClick={(e) => {
     e.stopPropagation();
-    router.push("/user");
+   const token = localStorage.getItem("userToken");
+
+if (token) {
+const mappedProp = {
+  id: prop.id,
+  property_name: prop.propertyName,
+  address: prop.address,
+  rent_per_month: prop.rentPerMonth,
+  sharing_type: prop.sharingType,
+  property_type: prop.propertyType,
+  pg_category: prop.pgCategory,
+  total_rooms: prop.availableRooms,
+  available_rooms: prop.availableRooms,
+  bathroom_type: prop.bathroomType || "",
+  description: prop.description || "",
+  rulesAndRegulations: prop.rulesAndRegulations || "",
+  amenities: prop.amenities || [],
+  images: prop.images || [],
+  propertyManager: prop.propertyManager || {},
+};
+router.push(
+  `/user/home/property/${prop.id}?data=${encodeURIComponent(
+    JSON.stringify(mappedProp)
+  )}`
+);
+} else {
+  router.push("/user");
+}
   }}
             style={{
               background: "transparent", color: "#0F766E",
@@ -626,6 +683,7 @@ useEffect(() => {
     <nav className="navbar" style={{
   background: "#0F766E",
   padding: "8px 12px",
+  justifyContent: "space-between",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -636,6 +694,7 @@ useEffect(() => {
       boxShadow: "0 2px 12px rgba(15,118,110,0.3)",
     }}>
       {/* Logo */}
+{/* LOGO */}
 <a
   href="#"
   style={{
@@ -646,52 +705,38 @@ useEffect(() => {
     flexShrink: 0
   }}
 >
-  {/* 🔥 ONLY IMAGE CONDITIONALLY */}
-  {!isLoggedIn && (
-    <div
-      style={{
-        width: 50,
-        height: 50,
-        borderRadius: 8,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden"
-      }}
-    >
-      <img
-        src="/pg_logo.png"
-        alt="PG Thikana Logo"
-        style={{
-          width: "70%",
-          height: "70%",
-          objectFit: "contain"
-        }}
-      />
-    </div>
-  )}
+  {/* 🔥 ICON (ONLY MOBILE) */}
+<img
+  src="/pg_logo.png"
+  alt="logo"
+  style={{
+    width: 36,
+    height: 36,
+    objectFit: "contain",
+  }}
+/>
 
-  {/* ✅ ALWAYS SHOW TEXT */}
-  <span
-    style={{
-      fontFamily: "'Georgia', serif",
-      fontSize: 20,
-      fontWeight: 700,
-      color: "white",
-      letterSpacing: "-0.3px"
-    }}
-  >
-    PG Thikana
-  </span>
+<span
+  className="logo-text"
+  style={{
+    fontFamily: "'Georgia', serif",
+    fontSize: 20,
+    fontWeight: 700,
+    color: "white",
+    letterSpacing: "-0.3px"
+  }}
+>
+  PG Thikana
+</span>
 </a>
 
       {/* Search */}
 <div
   className="nav-search"
   style={{
-    flex: 1,
-    maxWidth: 500,        // 🔥 limit width on desktop
-    margin: "0 auto",     // 🔥 center it
+flex: 1,
+minWidth: 0,
+margin: "0 8px",   // 🔥 THIS CENTERS IT// 🔥 center it
     display: "flex",
     alignItems: "center",
     overflow: "hidden",
@@ -843,11 +888,26 @@ const Hero = () => {
         </p>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button
-
-          onClick={(e) => {
+         <button
+  onClick={(e) => {
     e.stopPropagation();
-    router.push("/user");
+
+    const token = localStorage.getItem("userToken");
+
+    if (!token) {
+      // ❌ not logged in → go to login
+      router.push("/user");
+    } else {
+      // ✅ logged in → scroll
+      const section = document.getElementById("properties-section");
+
+      if (section) {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
   }}
           
           style={{
@@ -960,7 +1020,7 @@ const Filters = ({
         <div style={{ width: 1, height: 24, background: "#E5E7EB", flexShrink: 0 }} />
 
        {/* 🔥 FILTER DROPDOWNS (FULL FIXED + CONSISTENT) */}
-<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+<div className="filters-container">
 
   {/* Locality */}
   <select
@@ -1306,7 +1366,12 @@ if (activeType) {
         {/* List Panel */}
         <div style={{ padding: "1.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Available Properties</h2>
+            <h2
+  id="properties-section"
+  style={{ fontSize: 18, fontWeight: 600 }}
+>
+  Available Properties
+</h2>
             <span style={{
               fontSize: 13, background: "#CCFBF1", color: "#0D6B64",
               padding: "4px 10px", borderRadius: 100, fontWeight: 500,
@@ -1502,16 +1567,18 @@ if (activeType) {
       gap: 6px;
     }
 
-    /* LOGO stays left */
-    .navbar > a {
-      flex: 1;
-    }
+.navbar > a {
+  flex-shrink: 0;
+}
 
     /* BUTTONS stay right */
-    .navbar > div:last-child {
-      display: flex;
-      gap: 6px;
-    }
+/* 🔥 FORCE PROFILE ICON TO EXTREME RIGHT */
+.navbar > div:last-child {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;   /* 🔥 THIS IS THE KEY */
+}
 
     .navbar button {
       padding: 5px 10px !important;
@@ -1521,12 +1588,12 @@ if (activeType) {
     }
 
     /* 🔥 SEARCH FULL WIDTH (FIXES YOUR ISSUE) */
-    .nav-search {
-      order: 3;                     /* push to next row */
-      width: 100% !important;
-      max-width: 100% !important;
-      margin-top: 6px !important;
-    }
+.nav-search {
+  order: 2;
+  flex: 1;                 /* 🔥 takes middle space */
+  min-width: 0;
+  margin: 0 8px;           /* 🔥 spacing between logo & profile */
+}
 
     /* INPUT */
     .nav-search input {

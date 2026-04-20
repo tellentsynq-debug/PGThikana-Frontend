@@ -177,7 +177,7 @@ export default function PropertyDetailsPage() {
         {/* 🔥 IMAGE SLIDER */}
 <div className="relative">
 
-<div className="relative overflow-hidden rounded-xl">
+<div className="relative overflow-hidden rounded-xl aspect-[16/9] md:aspect-[21/9]">
 
   <div
     className="flex transition-transform duration-500"
@@ -189,7 +189,7 @@ export default function PropertyDetailsPage() {
       <img
         key={i}
         src={img?.image_url || img}
-        className="w-full h-[240px] md:h-[300px] object-cover flex-shrink-0"
+        className="w-full h-full object-cover flex-shrink-0"
       />
     ))}
   </div>

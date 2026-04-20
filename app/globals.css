@@ -74,46 +74,82 @@ body {
 
 @media (max-width: 768px) {
 
-  /* Prevent flex breaking */
-  button {
+  /* NAVBAR LAYOUT */
+  .navbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* LOGO LEFT */
+  .navbar > a {
+    order: 1;
     flex-shrink: 0;
   }
 
+  /* PROFILE RIGHT */
+  .navbar > div:last-child {
+    order: 2;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* SEARCH BELOW */
+  .nav-search {
+    order: 3;
+    width: 100%;
+    margin-top: 6px;
+    flex: 0 0 100%;
+  }
+
+  /* INPUT SAFETY */
   input {
     min-width: 0;
   }
 
-  .nav-search {
-    min-width: 0;
-  }
-
-  /* Navbar fix */
-  .navbar {
-    flex-wrap: wrap !important;
-    height: auto !important;
-    gap: 8px;
-  }
-
-  .nav-search {
-    min-width: 0;
-    width: 100% !important;
-    max-width: 100% !important;
-    order: 3;
-    margin: 6px 0 0 0 !important;  /* 🔥 ADD THIS */
-  }
-
-  .navbar button {
-    flex:unset;
+  button {
+    flex-shrink: 0;
     font-size: 12px;
     padding: 6px 10px;
   }
 
-  /* Safety */
-  body {
-    overflow-x: hidden;
+  /* LOGO SWITCH */
+  .logo-text {
+    display: none !important;
   }
-}
 
+  .mobile-logo {
+    display: block !important;
+  }
+
+  /* 🔥 FIXED FILTER GRID */
+  .filters-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* 🔥 CLEAN SELECT STYLE */
+  .filters-container select {
+    width: 100%;
+    font-size: 13px !important;
+    padding: 8px 10px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    background: #F9FAFB !important;
+    border: 1px solid #E5E7EB !important;
+  }
+
+  /* ❌ REMOVE FULL WIDTH FIRST ITEM (THIS WAS BREAKING UI) */
+  .filters-container select:first-child {
+    grid-column: auto;
+  }
+
+}
 /* ================= EXTRA SMALL DEVICES ================= */
 @media (max-width: 480px) {
   html {

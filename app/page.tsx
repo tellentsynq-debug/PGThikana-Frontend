@@ -205,8 +205,16 @@ const HomeIcon = () => (
   </svg>
 );
 
-const SearchIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+const SearchIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -306,12 +314,13 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
 
   return (
     <div
-      style={{
-        background: "white",
-        borderRadius: 14,
-        border: "1px solid #E5E7EB",
-        overflow: "hidden",
-        display: "flex",
+  className="property-card"
+  style={{
+    background: "white",
+    borderRadius: 14,
+    border: "1px solid #E5E7EB",
+    overflow: "hidden",
+    display: "flex",
         cursor: "pointer",
         transition: "box-shadow 0.25s, transform 0.25s",
       }}
@@ -326,6 +335,7 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
     >
       {/* Image Section */}
       <div
+      className="card-image-wrap"
         style={{ width: 240, flexShrink: 0, position: "relative", overflow: "hidden", background: "#F3F4F6", minHeight: 180 }}
         onMouseEnter={startCycle}
         onMouseLeave={stopCycle}
@@ -471,7 +481,7 @@ const PropertyCard = ({ prop }: { prop: Property }) => {
       
 
         {/* Buttons */}
-        <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
+        <div className="card-buttons" style={{ display: "flex", gap: 8, marginTop: "auto" }}>
           <button
   onClick={(e) => {
     e.stopPropagation();
@@ -595,13 +605,13 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
   );
 
   return (
-    <nav style={{
-      background: "#0F766E",
-      padding: "0 1.5rem",
-      height: 64,
-      display: "flex",
-      alignItems: "center",
-      gap: "1rem",
+    <nav className="navbar" style={{
+  background: "#0F766E",
+  padding: "8px 12px",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexWrap: "wrap",   // ✅ ADD THIS
       position: "sticky",
       top: 0,
       zIndex: 100,
@@ -634,11 +644,20 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
       </a>
 
       {/* Search */}
-      <div style={{
-        flex: 1, maxWidth: 480, margin: "0 auto",
-        display: "flex", background: "rgba(255,255,255,0.15)",
-        borderRadius: 8, overflow: "hidden", border: "1px solid rgba(255,255,255,0.25)",
-      }}>
+<div
+  className="nav-search"
+  style={{
+    flex: 1,
+    maxWidth: 500,        // 🔥 limit width on desktop
+    margin: "0 auto",     // 🔥 center it
+    display: "flex",
+    alignItems: "center",
+    overflow: "hidden",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,0.25)",
+    background: "rgba(255,255,255,0.15)",
+  }}
+>
         <input
           type="text"
           placeholder="Search by locality, city, property name..."
@@ -649,13 +668,23 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
             padding: "8px 12px", color: "white", fontSize: 14, fontFamily: "inherit",
           }}
         />
-        <button style={{
-          background: "white", border: "none", padding: "8px 14px",
-          cursor: "pointer", color: "#0F766E", fontWeight: 600, fontSize: 13,
-          fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4,
-        }}>
-          <SearchIcon /> Search
-        </button>
+      <button
+  style={{
+    background: "white",
+    border: "none",
+    padding: "6px",
+    cursor: "pointer",
+    color: "#0F766E",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 34,              // 🔥 fixed size
+    height: 34,
+    flexShrink: 0,
+  }}
+>
+  <SearchIcon size={16} />
+</button>
       </div>
 
       {/* Nav buttons */}
@@ -696,7 +725,7 @@ const Hero = () => {
   const router = useRouter();
 
   return (
-    <section style={{
+    <section className="hero-section" style={{
       background: "linear-gradient(135deg, #0F766E 0%, #0d9488 60%, #0f766e 100%)",
       padding: "3rem 1.5rem",
       display: "flex",
@@ -1339,20 +1368,76 @@ if (activeType) {
 </footer>
 
       {/* Global responsive styles */}
-      <style>{`
-        * { box-sizing: border-box; }
-        body { margin: 0; }
-        input { font-family: inherit; }
-        button { font-family: inherit; }
-        @media (max-width: 1024px) {
-          .main-layout { grid-template-columns: 1fr !important; }
-          .map-col { display: none; }
-        }
-        @media (max-width: 640px) {
-          .property-card { flex-direction: column !important; }
-          .card-image-wrap { width: 100% !important; height: 200px; }
-        }
-      `}</style>
+    <style>{`
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  input { font-family: inherit; }
+  button { font-family: inherit; }
+
+  @media (max-width: 1024px) {
+    .main-layout { grid-template-columns: 1fr !important; }
+    .map-col { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .property-card { flex-direction: column !important; }
+    .card-image-wrap { width: 100% !important; height: 200px; }
+  }
+
+  /* 🔥 FINAL MOBILE FIX */
+  @media (max-width: 768px) {
+
+    /* NAVBAR becomes 2 rows */
+    .navbar {
+      height: auto !important;
+      padding: 8px 12px !important;
+      flex-wrap: wrap !important;   /* 🔥 KEY */
+      gap: 6px;
+    }
+
+    /* LOGO stays left */
+    .navbar > a {
+      flex: 1;
+    }
+
+    /* BUTTONS stay right */
+    .navbar > div:last-child {
+      display: flex;
+      gap: 6px;
+    }
+
+    .navbar button {
+      padding: 5px 10px !important;
+      font-size: 12px !important;
+      border-radius: 6px !important;
+      white-space: nowrap;
+    }
+
+    /* 🔥 SEARCH FULL WIDTH (FIXES YOUR ISSUE) */
+    .nav-search {
+      order: 3;                     /* push to next row */
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-top: 6px !important;
+    }
+
+    /* INPUT */
+    .nav-search input {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px !important;
+      padding: 7px 10px !important;
+    }
+
+    /* SEARCH BUTTON */
+    .nav-search button {
+  flex-shrink: 0;
+  padding: 4px 6px !important;   /* 🔥 smaller */
+  font-size: 11px !important;
+  width: auto !important;        /* 🔥 prevent stretching */
+}
+  }
+`}</style>
     </div>
   );
 }

@@ -7,48 +7,43 @@ export default function Page() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen bg-[#F5F0EB] flex flex-col relative overflow-hidden">
+    <main className="min-h-screen bg-[#F5F0EB] flex items-center justify-center relative overflow-hidden px-6">
 
       {/* 🔶 SOFT BACKGROUND ACCENT */}
       <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-[#0F766E]/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-[-120px] right-[-100px] w-[300px] h-[300px] bg-[#0F766E]/10 rounded-full blur-3xl"></div>
 
-   
+      {/* 🔹 MAIN CARD (ALL CONTENT MERGED) */}
+      <div className="w-full max-w-md bg-white/90 backdrop-blur rounded-3xl shadow-xl p-8 border border-gray-100 relative z-10 flex flex-col items-center">
 
-      {/* 🔹 CENTER SECTION */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 relative z-10">
-
-        {/* LOGO CARD */}
-        <div className="bg-white rounded-[28px] shadow-lg px-10 py-6 flex items-center justify-center">
+        {/* LOGO */}
+        <div className="bg-white rounded-[28px] shadow-md px-8 py-5 flex items-center justify-center">
           <Image
             src="/pg_logo.png"
             alt="PG Logo"
-            width={110}
-            height={110}
+            width={100}
+            height={100}
             priority
           />
         </div>
 
         {/* TITLE */}
-        <h1 className="mt-8 text-[38px] font-bold text-[#0F766E] tracking-tight">
+        <h1 className="mt-6 text-[34px] font-bold text-[#0F766E] tracking-tight">
           PG Thikana
         </h1>
 
         {/* SUBTITLE */}
-        <p className="text-gray-500 mt-2 text-[15px]">
+        <p className="text-gray-500 mt-1 text-[14px]">
           Find your perfect stay
         </p>
 
         {/* TAGLINE */}
-        <p className="text-gray-400 mt-3 text-sm">
+        <p className="text-gray-400 mt-2 text-sm text-center">
           Verified PGs • Easy Booking • Trusted Platform
         </p>
-      </div>
 
-      {/* 🔹 ACTION SECTION */}
-      <div className="px-6 pb-10 relative z-10">
-        <div className="max-w-md mx-auto bg-white/90 backdrop-blur rounded-3xl shadow-xl p-6 border border-gray-100">
-
+        {/* BUTTONS */}
+        <div className="w-full mt-6">
           {/* CREATE ACCOUNT */}
           <button
             onClick={() => router.push("/user/create-account")}
@@ -66,12 +61,13 @@ export default function Page() {
           >
             Login
           </button>
-
-          {/* FOOTER */}
-          <p className="text-center text-gray-400 text-sm mt-5">
-            Discover PGs that feel like home
-          </p>
         </div>
+
+        {/* FOOTER */}
+        <p className="text-center text-gray-400 text-sm mt-5">
+          Discover PGs that feel like home
+        </p>
+
       </div>
     </main>
   );

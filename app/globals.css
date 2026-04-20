@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
+/* ================= ROOT THEME ================= */
 :root {
-  --background: #ffffff;
+  --background: #F0FDF9;
   --foreground: #171717;
 }
 
@@ -12,6 +13,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,12 +21,104 @@
   }
 }
 
-body {
+/* ================= GLOBAL FIXES ================= */
+
+/* ✅ Prevent black edges + horizontal scroll */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Layout stability */
+* {
+  box-sizing: border-box;
+}
+
+/* Media safety */
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Inputs & buttons */
+button, input, select {
+  font-family: inherit;
+}
+
+/* Typography */
+body {
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+/* ================= MOBILE FIXES ONLY ================= */
+/* 🚨 IMPORTANT: scoped ONLY to mobile (no desktop break) */
+
+@media (max-width: 768px) {
+
+  /* Prevent flex breaking */
+  button {
+    flex-shrink: 0;
+  }
+
+  input {
+    min-width: 0;
+  }
+
+  .nav-search {
+    min-width: 0;
+  }
+
+  /* Navbar fix */
+  .navbar {
+    flex-wrap: wrap !important;
+    height: auto !important;
+    gap: 8px;
+  }
+
+  .nav-search {
+    min-width: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    order: 3;
+    margin: 6px 0 0 0 !important;  /* 🔥 ADD THIS */
+  }
+
+  .navbar button {
+    flex:unset;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  /* Safety */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* ================= EXTRA SMALL DEVICES ================= */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* ================= ANIMATIONS ================= */
 @keyframes slideIn {
   0% {
     transform: translateX(100%) scale(0.95);

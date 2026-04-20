@@ -96,11 +96,13 @@ useEffect(() => {
 
        {/* 🔥 LOGO */}
 <div className="flex justify-center mb-4">
-  <img
-    src="/pg_logo.png"
-    alt="Logo"
-    className="h-16 object-contain"
-  />
+  <div className="bg-white shadow-md rounded-2xl p-3">
+    <img
+      src="/pg_logo.png"
+      alt="Logo"
+      className="h-10 object-contain"
+    />
+  </div>
 </div>
 
 <h1 className="text-xl font-bold text-center text-[#0F766E]">

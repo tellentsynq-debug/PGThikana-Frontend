@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
 
 export default function UserLayout({
@@ -8,12 +9,29 @@ export default function UserLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const [hasUserToken, setHasUserToken] = useState<boolean>(false);
 
-  // ✅ Ensure sidebar spacing works like admin
+  // ✅ Always re-check token on route change
   useEffect(() => {
-    const setInitialWidth = () => {
+    const checkToken = () => {
+      const token = localStorage.getItem("userToken");
+      setHasUserToken(!!token);
+    };
+
+    checkToken();
+
+    // ✅ Listen for token updates across tabs/components
+    window.addEventListener("storage", checkToken);
+
+    return () => window.removeEventListener("storage", checkToken);
+  }, [pathname]);
+
+  // ✅ Handle sidebar width
+  useEffect(() => {
+    const setWidth = () => {
       const isMobile = window.innerWidth < 768;
-      const width = isMobile ? 0 : 60; // collapsed sidebar default
+      const width = hasUserToken ? (isMobile ? 0 : 60) : 0;
 
       document.documentElement.style.setProperty(
         "--sidebar-width",
@@ -21,23 +39,21 @@ export default function UserLayout({
       );
     };
 
-    setInitialWidth();
-    window.addEventListener("resize", setInitialWidth);
+    setWidth();
+    window.addEventListener("resize", setWidth);
 
-    return () => window.removeEventListener("resize", setInitialWidth);
-  }, []);
+    return () => window.removeEventListener("resize", setWidth);
+  }, [hasUserToken]);
 
   return (
     <div className="flex">
+      {/* ✅ Sidebar updates instantly */}
+      {hasUserToken && <Sidebar />}
 
-      {/* 🔥 SIDEBAR */}
-      <Sidebar />
-
-      {/* 🔥 MAIN CONTENT (NO OVERLAP FIX) */}
       <div
         className="flex-1 min-h-screen bg-[#F8FAFC]"
         style={{
-          marginLeft: "var(--sidebar-width)",
+          marginLeft: hasUserToken ? "var(--sidebar-width)" : "0px",
           transition: "margin-left 0.3s ease",
         }}
       >

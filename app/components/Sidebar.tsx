@@ -27,40 +27,49 @@ export default function Sidebar() {
 
   const iconSize = 18;
 
-  // ✅ Detect screen size
-  useEffect(() => {
-    const checkScreen = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+useEffect(() => {
+  const checkAuth = () => {
+    const superToken = localStorage.getItem("token");
+    const adminToken = localStorage.getItem("adminToken");
+    const userToken = localStorage.getItem("userToken");
 
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
+    const user = localStorage.getItem("user");
 
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
-
-  useEffect(() => {
-  const superToken = localStorage.getItem("token");
-  const adminToken = localStorage.getItem("adminToken");
-  const userToken = localStorage.getItem("userToken");
-
-  const user = localStorage.getItem("user");
-
-  if (user) {
-    try {
-      const parsed = JSON.parse(user);
-      setUsername(parsed.username);
-    } catch {
-      setUsername("");
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        setUsername(parsed.username);
+      } catch {
+        setUsername("");
+      }
     }
-  }
 
-  if (superToken) setRole("superadmin");
-  else if (adminToken) setRole("admin");
-  else if (userToken) setRole("user"); // ✅ NEW
-  else setRole(null);
+    if (superToken) setRole("superadmin");
+    else if (adminToken) setRole("admin");
+    else if (userToken) setRole("user");
+    else setRole(null);
+  };
 
-}, [pathname]);
+  checkAuth(); // run once
+
+  // 🔥 listen for login/logout
+  window.addEventListener("authChanged", checkAuth);
+
+  return () => {
+    window.removeEventListener("authChanged", checkAuth);
+  };
+}, []);
+
+useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  checkMobile(); // run once
+
+  window.addEventListener("resize", checkMobile);
+  return () => window.removeEventListener("resize", checkMobile);
+}, []);
 
 useEffect(() => {
   // 🚫 DO NOT affect layout on mobile
@@ -100,7 +109,7 @@ useEffect(() => {
   ];
 
   const userMenu = [
-  { name: "Home", icon: LayoutDashboard, path: "/user/home" },
+  { name: "Home", icon: LayoutDashboard, path: "/" },
   { name: "Saved PGs", icon: Heart, path: "/user/home/saved" },
   { name: "Bookings", icon: Building2, path: "/user/home/bookings" },
   { name: "Chat", icon: MessageSquare, path: "/user/home/chat" },

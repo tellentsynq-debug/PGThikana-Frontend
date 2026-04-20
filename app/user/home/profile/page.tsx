@@ -21,26 +21,35 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+const fetchProfile = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
 
-      const data = await res.json();
-
-      if (data.success) {
-        setUser(data.user);
-      }
-
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
+    if (!token) {
+      router.replace("/user"); // not logged in
+      return;
     }
-  };
+
+    const res = await fetch(`${API_BASE}/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setUser(data.user);
+    } else {
+      toast("Failed to load profile");
+    }
+
+    setLoading(false);
+  } catch (err) {
+    console.error(err);
+    setLoading(false);
+  }
+};
 
 const logout = () => {
   // clear only auth-related data (safer)

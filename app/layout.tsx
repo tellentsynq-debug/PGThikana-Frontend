@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SnackbarProvider } from "@/app/context/SnackbarContext";
+import ClientLayout from "./ClientLayout"; // 👈 important
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,6 @@ export const metadata: Metadata = {
   description: "Find verified PGs, hostels & flats near you",
 };
 
-// ✅ 🔥 THIS FIXES YOUR BLACK SCREEN ISSUE
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -39,12 +39,12 @@ export default function RootLayout({
           margin: 0,
           padding: 0,
           width: "100%",
-          overflowX: "hidden", // ✅ prevents side scroll / black gap
-          background: "#F0FDF9", // ✅ same as your app bg (removes black)
+          overflowX: "hidden",
+          background: "#F0FDF9",
         }}
       >
         <SnackbarProvider>
-          {children}
+          <ClientLayout>{children}</ClientLayout>
         </SnackbarProvider>
       </body>
     </html>

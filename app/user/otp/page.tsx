@@ -74,8 +74,12 @@ useEffect(() => {
       const data = await res.json();
 
       if (res.status === 200) {
-        localStorage.setItem("userToken", data.token);
-        router.push("/user/home");
+localStorage.setItem("userToken", data.token);
+
+// 🔥 notify whole app
+window.dispatchEvent(new Event("authChanged"));
+
+window.location.href = "/";
       } else if (res.status === 404) {
         router.push(`/user/name?phone=${phone}&otp=${otp.join("")}`);
       } else {

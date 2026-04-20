@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
+import { usePathname } from "next/navigation";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -590,7 +590,25 @@ height: "420px",
 const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
   const [query, setQuery] = useState("");
   const router = useRouter();
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const pathname = usePathname();
+
+
+useEffect(() => {
+  const checkAuth = () => {
+    const token = localStorage.getItem("userToken");
+    setIsLoggedIn(!!token);
+  };
+
+  checkAuth();
+
+  window.addEventListener("authChanged", checkAuth);
+
+  return () => {
+    window.removeEventListener("authChanged", checkAuth);
+  };
+}, []); // ✅ ALWAYS EMPTY ARRAY
 
   const handleInput = useCallback(
     (() => {
@@ -618,30 +636,54 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
       boxShadow: "0 2px 12px rgba(15,118,110,0.3)",
     }}>
       {/* Logo */}
-      <a href="#" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0 }}>
-      <div style={{
-  width: 50,
-  height: 50,  
-  borderRadius: 8,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  overflow: "hidden"
-}}>
-  <img
-    src="/pg_logo.png"
-    alt="PG Thikana Logo"
+<a
+  href="#"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    textDecoration: "none",
+    flexShrink: 0
+  }}
+>
+  {/* 🔥 ONLY IMAGE CONDITIONALLY */}
+  {!isLoggedIn && (
+    <div
+      style={{
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden"
+      }}
+    >
+      <img
+        src="/pg_logo.png"
+        alt="PG Thikana Logo"
+        style={{
+          width: "70%",
+          height: "70%",
+          objectFit: "contain"
+        }}
+      />
+    </div>
+  )}
+
+  {/* ✅ ALWAYS SHOW TEXT */}
+  <span
     style={{
-      width: "70%",
-      height: "70%",
-      objectFit: "contain"
+      fontFamily: "'Georgia', serif",
+      fontSize: 20,
+      fontWeight: 700,
+      color: "white",
+      letterSpacing: "-0.3px"
     }}
-  />
-</div>
-        <span style={{ fontFamily: "'Georgia', serif", fontSize: 20, fontWeight: 700, color: "white", letterSpacing: "-0.3px" }}>
-          PG Thikana
-        </span>
-      </a>
+  >
+    PG Thikana
+  </span>
+</a>
 
       {/* Search */}
 <div
@@ -688,32 +730,63 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
       </div>
 
       {/* Nav buttons */}
-      <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexShrink: 0 }}>
-  {["Login", "List Property"].map((label) => (
-    <button
-      key={label}
-      onClick={() => {
-        if (label === "Login") {
-          router.push("/user");
-        } else {
-          router.push("/vendor");
-        }
-      }}
+     <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexShrink: 0 }}>
+
+  {!isLoggedIn ? (
+    ["Login", "List Property"].map((label) => (
+      <button
+        key={label}
+        onClick={() => {
+          if (label === "Login") {
+            router.push("/user");
+          } else {
+            router.push("/vendor");
+          }
+        }}
+        style={{
+          background: "rgba(255,255,255,0.15)",
+          border: "1px solid rgba(255,255,255,0.3)",
+          color: "white",
+          padding: "7px 14px",
+          borderRadius: 7,
+          fontSize: 13,
+          fontWeight: 500,
+          cursor: "pointer",
+        }}
+      >
+        {label}
+      </button>
+    ))
+  ) : (
+    // ✅ PROFILE ICON
+    <div
+      onClick={() => router.push("/user/home/profile")}
       style={{
-        background: "rgba(255,255,255,0.15)",
-        border: "1px solid rgba(255,255,255,0.3)",
-        color: "white",
-        padding: "7px 14px",
-        borderRadius: 7,
-        fontSize: 13,
-        fontFamily: "inherit",
-        fontWeight: 500,
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        background: "white",
+        color: "#0F766E",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 700,
         cursor: "pointer",
+        fontSize: 14,
       }}
     >
-      {label}
-    </button>
-  ))}
+    {(() => {
+  const name = localStorage.getItem("username") || "User";
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+})()}
+    </div>
+  )}
+
 </div>
     </nav>
   );
@@ -1036,6 +1109,43 @@ export default function Page() {
 
     const router = useRouter();
 
+
+    useEffect(() => {
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+        );
+        const data = await res.json();
+
+        const locality =
+          data.address?.suburb ||
+          data.address?.city ||
+          data.address?.town ||
+          data.address?.village ||
+          "";
+
+        if (locality) {
+          setFilters((prev) => ({
+            ...prev,
+            locality,
+          }));
+        }
+      } catch (err) {
+        console.log("Location fetch failed");
+      }
+    },
+    (err) => {
+      console.log("User denied location");
+    }
+  );
+}, []);
+
   useEffect(() => {
   const vendorToken = localStorage.getItem("vendorToken");
   const adminToken = localStorage.getItem("adminToken");
@@ -1048,9 +1158,6 @@ export default function Page() {
     router.replace("/admin"); // or your admin route
   }else if(superAdminToken){
      router.replace("/super-admin")
-  }
-  else if (userToken) {
-    router.replace("/user/home"); // or your user route
   }
 }, []);
 

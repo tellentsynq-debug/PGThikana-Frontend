@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Key } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
@@ -40,9 +40,9 @@ const FALLBACK_IMAGES = [
 ];
 
 const HERO_SLIDES = [
-  "/slide1.png",
-  "/slide2.png",
-  "/slide3.png",
+  "/slidex1.png",
+  "/slidex2.png",
+  "/slidex3.png",
 ];
 const AMENITY_ICONS: Record<string, string> = {
   wifi: "📶",
@@ -603,13 +603,13 @@ const HeroSlider = () => {
 
   return (
 <div style={{
-width: "100%",
-height: "420px",
-
+  width: "100%",
+  height: "100%",
+  minHeight: "420px",        // ✅ taller for desktop
   position: "relative",
   borderRadius: 20,
   overflow: "hidden",
-  boxShadow: "0 30px 80px rgba(0,0,0,0.35)"
+  boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
 }}>
       {HERO_SLIDES.map((src, i) => (
         <img
@@ -839,116 +839,316 @@ margin: "0 8px",   // 🔥 THIS CENTERS IT// 🔥 center it
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
 
-const Hero = () => {
+type HeroProps = {
+  locationQuery: string;
+  setLocationQuery: (val: string) => void;
+  suggestions: any[];
+  showSuggestions: boolean;
+  setShowSuggestions: (val: boolean) => void;
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      locality: string;
+      budget: string;
+      gender: string;
+      sharing: string;
+    }>
+  >;
+  setActiveType: (type: string) => void;
+};
+
+const Hero = ({
+  locationQuery,
+  setLocationQuery,
+  suggestions,
+  showSuggestions,
+  setShowSuggestions,
+  setFilters,
+  setActiveType,
+}: HeroProps) => {
   const router = useRouter();
+  const searchBoxRef = useRef<HTMLDivElement>(null); // ✅ ref for anchor
 
   return (
     <section className="hero-section" style={{
-      background: "linear-gradient(135deg, #0F766E 0%, #0d9488 60%, #0f766e 100%)",
-      padding: "3rem 1.5rem",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: "4rem",
-      minHeight: 320,
+      background: "#F8F9FA",
+      padding: "1rem",
+      display: "grid",
+      gridTemplateColumns: "1fr 340px",
+      gap: "1rem",
+      alignItems: "stretch",
       position: "relative",
-      overflow: "hidden",
+      zIndex: 95,
     }}>
-      {/* Dot pattern overlay */}
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
-        backgroundSize: "30px 30px",
-      }} />
 
-      {/* Content */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "700px" }}>
+      {/* LEFT */}
+
+<div style={{
+  position: "relative",
+  borderRadius: 20,
+  overflow: "hidden",   // ✅ THIS is what clips the grey corners
+  background: "#0F766E", // ✅ hides any gap while image loads
+}}>
+        <HeroSlider />
+
+        {/* Overlay */}
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
-          color: "white", fontSize: 12, fontWeight: 500,
-          padding: "5px 12px", borderRadius: 100, marginBottom: "1.2rem",
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.45))",
+          zIndex: 1,
+          pointerEvents: "none",
+        }} />
+
+        {/* TEXT + SEARCH */}
+        <div style={{
+          position: "absolute",
+          bottom: 20,
+          left: 16,
+          right: 16,
+          zIndex: 100,
+          overflow: "visible",
         }}>
-          <StarIcon /> Trusted by 10,000+ tenants
-        </div>
-
-        <h1 style={{
-          fontFamily: "'Georgia', serif",
-          fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
-          fontWeight: 700, color: "white",
-          lineHeight: 1.15, marginBottom: "1rem",
-        }}>
-          Skip the queue.<br />
-          <span style={{ color: "#A7F3D0" }}>Book your Room</span><br />
-          today.
-        </h1>
-
-        <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 15, lineHeight: 1.6, marginBottom: "1.5rem", maxWidth: 480 }}>
-          Find verified PGs, hostels & flats near you — with real photos, fair pricing, and zero brokerage.
-        </p>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-         <button
-  onClick={(e) => {
-    e.stopPropagation();
-
-    const token = localStorage.getItem("userToken");
-
-    if (!token) {
-      // ❌ not logged in → go to login
-      router.push("/user");
-    } else {
-      // ✅ logged in → scroll
-      const section = document.getElementById("properties-section");
-
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }
-  }}
-          
-          style={{
-            
-            background: "white", color: "#0F766E", fontWeight: 600, fontSize: 14,
-            padding: "11px 22px", borderRadius: 8, border: "none", cursor: "pointer",
+          <h1 style={{
+            fontFamily: "'Georgia', serif",
+            fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
+            fontWeight: 700,
+            color: "white",
+            marginBottom: "0.6rem",
           }}>
-            
-            Explore Listings
-          </button>
+            Skip the hunt.<br />Find your perfect PG.
+          </h1>
 
-          <button
-            onClick={() => router.push("/vendor")}
+          <p style={{
+            color: "rgba(255,255,255,0.85)",
+            fontSize: 14,
+            marginBottom: "1rem",
+          }}>
+            Verified rooms. Zero brokerage.
+          </p>
+
+          {/* 🔥 SEARCH BOX */}
+          <div
+            ref={searchBoxRef}
             style={{
-              background: "transparent",
-              color: "white",
-              fontWeight: 500,
-              fontSize: 14,
-              padding: "11px 22px",
-              borderRadius: 8,
-              border: "1.5px solid rgba(255,255,255,0.5)",
-              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              background: "white",
+              borderRadius: 10,
+              padding: "6px 10px",
+              gap: 8,
+              maxWidth: 520,
+              position: "relative",
+              zIndex: 9999,
             }}
           >
-            Add Property
-          </button>
+            <input
+              type="text"
+              placeholder="Search city or locality..."
+              value={locationQuery}
+              onChange={(e) => setLocationQuery(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                fontSize: 14,
+                padding: "8px",
+              }}
+            />
+
+            <button
+              onClick={() =>
+                document
+                  .getElementById("properties-section")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              style={{
+                background: "#0F766E",
+                color: "white",
+                border: "none",
+                padding: "8px 14px",
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Search
+            </button>
+
+            {/* ✅ PROPERLY ANCHORED DROPDOWN */}
+            {showSuggestions && suggestions.length > 0 && (() => {
+              const rect = searchBoxRef.current?.getBoundingClientRect();
+              return (
+                <div style={{
+                  position: "fixed",
+                  top: rect ? rect.bottom + 4 : 0,
+                  left: rect ? rect.left : 0,
+                  width: rect ? rect.width : 520,
+                  background: "white",
+                  borderRadius: 10,
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                  zIndex: 99999,
+                  maxHeight: 240,
+                  overflowY: "auto",
+                  border: "1px solid #E5E7EB",
+                }}>
+                  {suggestions.map((
+                    s: { address: { city: any; town: any; state: any }; display_name: any },
+                    i: Key | null | undefined
+                  ) => {
+                    const city =
+                      s.address?.city ||
+                      s.address?.town ||
+                      s.address?.state ||
+                      s.display_name;
+
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => {
+                          setLocationQuery(city);
+                          setShowSuggestions(false);
+                          setFilters((prev) => ({
+                            ...prev,
+                            locality: city,
+                          }));
+                          setTimeout(() => {
+                            document
+                              .getElementById("properties-section")
+                              ?.scrollIntoView({ behavior: "smooth" });
+                          }, 100);
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.background = "#F0FDF9")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.background = "white")
+                        }
+                        style={{
+                          padding: "10px 14px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          borderBottom: "1px solid #eee",
+                          color: "#111827",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        📍 {city}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
         </div>
       </div>
 
-      <div className="hero-slider-wrap" style={{ flex: 1 }}>
-        <HeroSlider />
-      </div>
+      {/* RIGHT CARDS */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          {
+            title: "PG Stays",
+            subtitle: "Affordable & verified",
+            img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&q=75",
+            type: "PG",
+          },
+          {
+            title: "Student Hostels",
+            subtitle: "Best for students",
+            img: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&q=75",
+            type: "Hostel",
+          },
+          {
+            title: "Rooms",
+            subtitle: "Private & shared",
+            img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=75",
+            type: "Room",
+          },
+        ].map((card) => (
+          <div
+            key={card.title}
+            onClick={() => {
+              setActiveType(card.type);
+              document
+                .getElementById("properties-section")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            style={{
+              position: "relative",
+              borderRadius: 16,
+              overflow: "hidden",   // ✅ keep images clipped inside cards
+              minHeight: 120,
+              cursor: "pointer",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "translateY(-2px)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "translateY(0)")
+            }
+          >
+            <img
+              src={card.img}
+              alt={card.title}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
 
-      <style>{`
-        .hero-slider-wrap { position: relative; z-index: 1; }
-        @media (max-width: 768px) { .hero-slider-wrap { display: none; } }
-      `}</style>
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(to right, rgba(255,255,255,0.88), transparent)",
+            }} />
+
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 16px",
+            }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>
+                  {card.title}
+                </div>
+                <div style={{ fontSize: 12, color: "#555", marginTop: 2 }}>
+                  {card.subtitle}
+                </div>
+              </div>
+
+              <div style={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                background: "#0F766E",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 16,
+                flexShrink: 0,
+              }}>
+                →
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 };
-
 // ─── FILTERS ──────────────────────────────────────────────────────────────────
 
 interface FiltersProps {
@@ -1162,12 +1362,40 @@ export default function Page() {
   sharing: "",
 }); 
 
+
+const [locationQuery, setLocationQuery] = useState("");
+const [suggestions, setSuggestions] = useState<any[]>([]);
+const [showSuggestions, setShowSuggestions] = useState(false);
+
     const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
     const [categories, setCategories] = useState<string[]>([]);
     const [sharingTypes, setSharingTypes] = useState<string[]>([]);
     const [budgets, setBudgets] = useState<number[]>([]);
 
     const router = useRouter();
+
+
+    useEffect(() => {
+  if (!locationQuery || locationQuery.length < 2) {
+    setSuggestions([]);
+    return;
+  }
+
+  const delay = setTimeout(async () => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${locationQuery}&format=json&addressdetails=1&limit=5`
+      );
+      const data = await res.json();
+      setSuggestions(data);
+      setShowSuggestions(true);
+    } catch {
+      setSuggestions([]);
+    }
+  }, 300);
+
+  return () => clearTimeout(delay);
+}, [locationQuery]);
 
 
     useEffect(() => {
@@ -1350,7 +1578,15 @@ if (activeType) {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
       <Navbar onSearch={handleSearch} />
-      <Hero />
+      <Hero
+  locationQuery={locationQuery}
+  setLocationQuery={setLocationQuery}
+  suggestions={suggestions}
+  showSuggestions={showSuggestions}
+  setShowSuggestions={setShowSuggestions}
+  setFilters={setFilters}
+  setActiveType={setActiveType}
+/>
 <Filters
   localities={localities}
   activeType={activeType}
@@ -1551,34 +1787,26 @@ if (activeType) {
     .map-col { display: none; }
   }
 
-  @media (max-width: 640px) {
-    .property-card { flex-direction: column !important; }
-    .card-image-wrap { width: 100% !important; height: 200px; }
-  }
-
-  /* 🔥 FINAL MOBILE FIX */
   @media (max-width: 768px) {
 
-    /* NAVBAR becomes 2 rows */
+    /* ─── NAVBAR ─────────────────────────────── */
     .navbar {
       height: auto !important;
       padding: 8px 12px !important;
-      flex-wrap: wrap !important;   /* 🔥 KEY */
+      flex-wrap: wrap !important;
       gap: 6px;
     }
 
-.navbar > a {
-  flex-shrink: 0;
-}
+    .navbar > a {
+      flex-shrink: 0;
+    }
 
-    /* BUTTONS stay right */
-/* 🔥 FORCE PROFILE ICON TO EXTREME RIGHT */
-.navbar > div:last-child {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-left: auto;   /* 🔥 THIS IS THE KEY */
-}
+    .navbar > div:last-child {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-left: auto;
+    }
 
     .navbar button {
       padding: 5px 10px !important;
@@ -1587,15 +1815,13 @@ if (activeType) {
       white-space: nowrap;
     }
 
-    /* 🔥 SEARCH FULL WIDTH (FIXES YOUR ISSUE) */
-.nav-search {
-  order: 2;
-  flex: 1;                 /* 🔥 takes middle space */
-  min-width: 0;
-  margin: 0 8px;           /* 🔥 spacing between logo & profile */
-}
+    .nav-search {
+      order: 2;
+      flex: 1;
+      min-width: 0;
+      margin: 0 8px;
+    }
 
-    /* INPUT */
     .nav-search input {
       flex: 1;
       min-width: 0;
@@ -1603,13 +1829,76 @@ if (activeType) {
       padding: 7px 10px !important;
     }
 
-    /* SEARCH BUTTON */
     .nav-search button {
-  flex-shrink: 0;
-  padding: 4px 6px !important;   /* 🔥 smaller */
-  font-size: 11px !important;
-  width: auto !important;        /* 🔥 prevent stretching */
-}
+      flex-shrink: 0;
+      padding: 4px 6px !important;
+      font-size: 11px !important;
+      width: auto !important;
+    }
+
+    /* ─── HERO ───────────────────────────────── */
+
+    /* Stack hero into single column */
+    .hero-section {
+      grid-template-columns: 1fr !important;
+      padding: 0.75rem !important;
+      gap: 0.75rem !important;
+    }
+
+    /* Give the slider a fixed height */
+    .hero-section > div:first-child {
+      min-height: 300px !important;
+      height: 300px !important;
+    }
+
+    /* Right cards → horizontal scroll row */
+    .hero-section > div:last-child {
+      flex-direction: row !important;
+      overflow-x: auto !important;
+      scrollbar-width: none !important;
+      gap: 8px !important;
+      padding-bottom: 4px !important;
+    }
+
+    .hero-section > div:last-child::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Each card fixed width */
+    .hero-section > div:last-child > div {
+      min-width: 155px !important;
+      min-height: 90px !important;
+      flex-shrink: 0 !important;
+      border-radius: 12px !important;
+    }
+
+    /* ─── PROPERTY CARDS ─────────────────────── */
+    .property-card {
+      flex-direction: column !important;
+    }
+
+    .card-image-wrap {
+      width: 100% !important;
+      height: 200px !important;
+    }
+
+    /* ─── FILTERS ────────────────────────────── */
+    .filters-container {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      gap: 8px !important;
+      scrollbar-width: none !important;
+    }
+
+    .filters-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filters-container select {
+      flex-shrink: 0 !important;
+      font-size: 12px !important;
+    }
   }
 `}</style>
     </div>

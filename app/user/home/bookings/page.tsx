@@ -73,17 +73,15 @@ export default function MyBookingsPage() {
     <div className="min-h-screen bg-white">
 
       {/* 🔥 HEADER */}
-      <div className="sticky top-0 z-20 bg-white border-b px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-[#0F766E] px-4 py-3 flex items-center gap-3">
 <button
   onClick={() => router.back()}
-  className="w-10 h-10 flex items-center justify-center rounded-full 
-             bg-black text-white shadow-md 
-             hover:bg-black transition"
+  className="flex items-center justify-center"
 >
-  <ArrowLeft size={20} />
+  <ArrowLeft size={22} className="text-white" />
 </button>
 
-        <h1 className="text-lg font-semibold text-gray-900">
+        <h1 className="text-lg font-semibold text-white">
           My Bookings
         </h1>
       </div>

@@ -1485,7 +1485,7 @@ const [showSuggestions, setShowSuggestions] = useState(false);
 }, [locationQuery]);
 
 
-    useEffect(() => {
+   useEffect(() => {
   if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(
@@ -1499,17 +1499,21 @@ const [showSuggestions, setShowSuggestions] = useState(false);
         const data = await res.json();
 
         const locality =
-          data.address?.suburb ||
           data.address?.city ||
           data.address?.town ||
+          data.address?.suburb ||
           data.address?.village ||
           "";
 
         if (locality) {
+          // ✅ SET FILTER (already correct)
           setFilters((prev) => ({
             ...prev,
             locality,
           }));
+
+          // ✅ ADD THIS (IMPORTANT 🔥)
+          setLocationQuery(locality);
         }
       } catch (err) {
         console.log("Location fetch failed");

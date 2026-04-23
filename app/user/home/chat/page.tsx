@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import io from "socket.io-client";
+import { ArrowLeft } from "lucide-react";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -102,7 +103,7 @@ export default function ChatListPage() {
           onClick={() => router.back()}
           className="w-9 h-9 flex items-center justify-center rounded-full bg-teal-700 text-white"
         >
-          ←
+          <ArrowLeft></ArrowLeft>
         </button>
 
         <h1 className="font-semibold text-lg">

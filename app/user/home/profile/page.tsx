@@ -80,19 +80,20 @@ const logout = () => {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* 🔥 HEADER */}
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow"
-        >
-          <ArrowLeft></ArrowLeft>
-        </button>
+     {/* 🔥 HEADER */}
+<div className="bg-teal-700 px-4 py-3 flex items-center gap-3">
 
-        <h1 className="text-lg font-semibold text-black">
-          Profile
-        </h1>
-      </div>
+  <button
+    onClick={() => router.back()}
+    className="flex items-center justify-center"
+  >
+    <ArrowLeft className="text-white w-6 h-6" />
+  </button>
+
+  <h1 className="text-lg font-semibold text-white">
+    Profile
+  </h1>
+</div>
 
       {/* 🔥 CONTENT */}
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">

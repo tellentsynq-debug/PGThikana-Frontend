@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowBigLeft, ArrowLeft } from "lucide-react";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -64,15 +65,12 @@ export default function SavedPropertiesPage() {
     <div className="min-h-screen bg-white">
 
       {/* 🔥 HEADER */}
-      <div className="sticky top-0 z-20 bg-white border-b px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => router.back()}
-          className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-black transition bg-black text-white"
-        >
-          ←
-        </button>
+      <div className="sticky top-0 z-20 bg-[#0F766E] px-4 py-3 flex items-center gap-3">
+       <button onClick={() => router.back()}>
+  <ArrowLeft className="text-white w-6 h-6" />
+</button>
 
-        <h1 className="text-lg font-semibold text-gray-900">
+        <h1 className="text-lg font-semibold text-white">
           Saved Properties
         </h1>
       </div>

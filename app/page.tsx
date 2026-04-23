@@ -39,6 +39,17 @@ const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=75",
 ];
 
+const POPULAR_CITIES = [
+  { name: "Kanpur", icon: "🏛️" },
+  { name: "Lucknow", icon: "🕌" },
+  { name: "Delhi", icon: "🗼" },
+  { name: "Mumbai", icon: "🌉" },
+  { name: "Bengaluru", icon: "🏙️" },
+  { name: "Hyderabad", icon: "🏰" },
+  { name: "Pune", icon: "🎭" },
+  { name: "Ahmedabad", icon: "⛪" },
+];
+
 const HERO_SLIDES = [
   "/slidex1.png",
   "/slidex2.png",
@@ -605,7 +616,7 @@ const HeroSlider = () => {
 <div style={{
   width: "100%",
   height: "100%",
-  minHeight: "420px",        // ✅ taller for desktop
+  minHeight: "100%",
   position: "relative",
   borderRadius: 20,
   overflow: "hidden",
@@ -680,160 +691,103 @@ useEffect(() => {
   );
 
   return (
-    <nav className="navbar" style={{
-  background: "#0F766E",
-  padding: "8px 12px",
-  justifyContent: "space-between",
+<nav style={{
+  background: "rgba(255,255,255,0.85)",
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  padding: "0 2.5rem",
   display: "flex",
   alignItems: "center",
-  gap: "8px",
-  flexWrap: "wrap",   // ✅ ADD THIS
-      position: "sticky",
-      top: 0,
-      zIndex: 100,
-      boxShadow: "0 2px 12px rgba(15,118,110,0.3)",
-    }}>
-      {/* Logo */}
-{/* LOGO */}
-<a
-  href="#"
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    textDecoration: "none",
-    flexShrink: 0
-  }}
->
-  {/* 🔥 ICON (ONLY MOBILE) */}
-<img
-  src="/pg_logo.png"
-  alt="logo"
-  style={{
-    width: 36,
-    height: 36,
-    objectFit: "contain",
-  }}
-/>
+  justifyContent: "space-between",
+  height: 68,
+  position: "sticky",
+  top: 0,
+  zIndex: 100,
+  boxShadow: "0 4px 24px rgba(15,118,110,0.08)",
+}}>
+  {/* LOGO */}
+  <a href="#" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+    <img src="/pg_logo.png" alt="logo" style={{ width: 36, height: 36, objectFit: "contain" }} />
+  <span style={{
+  fontFamily: "'Georgia', serif",
+  fontSize: 21,
+  fontWeight: 700,
+  color: "#0F766E",
+  letterSpacing: "-0.5px",
+  background: "linear-gradient(135deg, #0F766E, #14B8A6)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+}}>
+      PG Thikana
+    </span>
+  </a>
 
-<span
-  className="logo-text"
-  style={{
-    fontFamily: "'Georgia', serif",
-    fontSize: 20,
-    fontWeight: 700,
-    color: "white",
-    letterSpacing: "-0.3px"
-  }}
->
-  PG Thikana
-</span>
-</a>
-
-      {/* Search */}
-<div
-  className="nav-search"
-  style={{
-flex: 1,
-minWidth: 0,
-margin: "0 8px",   // 🔥 THIS CENTERS IT// 🔥 center it
-    display: "flex",
-    alignItems: "center",
-    overflow: "hidden",
-    borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.25)",
-    background: "rgba(255,255,255,0.15)",
-  }}
->
-        <input
-          type="text"
-          placeholder="Search by locality, city, property name..."
-          value={query}
-          onChange={(e) => handleInput(e.target.value)}
-          style={{
-            flex: 1, background: "transparent", border: "none", outline: "none",
-            padding: "8px 12px", color: "white", fontSize: 14, fontFamily: "inherit",
-          }}
-        />
-      <button
-  style={{
-    background: "white",
-    border: "none",
-    padding: "6px",
-    cursor: "pointer",
-    color: "#0F766E",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 34,              // 🔥 fixed size
-    height: 34,
-    flexShrink: 0,
-  }}
->
-  <SearchIcon size={16} />
-</button>
-      </div>
-
-      {/* Nav buttons */}
-     <div style={{ display: "flex", gap: 8, marginLeft: "auto", flexShrink: 0 }}>
-
-  {!isLoggedIn ? (
-    ["Login", "List Property"].map((label) => (
-      <button
-        key={label}
-        onClick={() => {
-          if (label === "Login") {
-            router.push("/user");
-          } else {
-            router.push("/vendor");
-          }
-        }}
+  {/* RIGHT BUTTONS */}
+  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+    {!isLoggedIn ? (
+      <>
+        <button
+          onClick={() => router.push("/user")}
         style={{
-          background: "rgba(255,255,255,0.15)",
-          border: "1px solid rgba(255,255,255,0.3)",
-          color: "white",
-          padding: "7px 14px",
-          borderRadius: 7,
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: "pointer",
+  background: "transparent",
+  border: "1.5px solid #0F766E",
+  color: "#0F766E",
+  padding: "8px 22px",
+  borderRadius: 50,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#F0FDF9";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+          }}
+        >
+          Login
+        </button>
+        <button
+          onClick={() => router.push("/vendor")}
+         style={{
+  background: "linear-gradient(135deg, #0F766E, #0D9488)",
+  border: "none",
+  color: "white",
+  padding: "8px 22px",
+  borderRadius: 50,
+  boxShadow: "0 4px 14px rgba(15,118,110,0.35)",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#0D6B64"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "#0F766E"; }}
+        >
+          List Property
+        </button>
+      </>
+    ) : (
+      <div
+        onClick={() => router.push("/user/home/profile")}
+        style={{
+          width: 36, height: 36, borderRadius: "50%",
+          background: "#0F766E", color: "white",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontWeight: 700, cursor: "pointer", fontSize: 14,
         }}
       >
-        {label}
-      </button>
-    ))
-  ) : (
-    // ✅ PROFILE ICON
-    <div
-      onClick={() => router.push("/user/home/profile")}
-      style={{
-        width: 36,
-        height: 36,
-        borderRadius: "50%",
-        background: "white",
-        color: "#0F766E",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: 700,
-        cursor: "pointer",
-        fontSize: 14,
-      }}
-    >
-    {(() => {
-  const name = localStorage.getItem("username") || "User";
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-})()}
-    </div>
-  )}
-
-</div>
-    </nav>
+        {(() => {
+          const name = localStorage.getItem("username") || "User";
+          return name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
+        })()}
+      </div>
+    )}
+  </div>
+</nav>
   );
 };
 
@@ -866,27 +820,33 @@ const Hero = ({
   setActiveType,
 }: HeroProps) => {
   const router = useRouter();
-  const searchBoxRef = useRef<HTMLDivElement>(null); // ✅ ref for anchor
+  const searchBoxRef = useRef<HTMLDivElement>(null);
+const [cityModalOpen, setCityModalOpen] = useState(false);
+const [modalQuery, setModalQuery] = useState("");
 
   return (
-    <section className="hero-section" style={{
-      background: "#F8F9FA",
-      padding: "1rem",
-      display: "grid",
-      gridTemplateColumns: "1fr 340px",
-      gap: "1rem",
-      alignItems: "stretch",
-      position: "relative",
-      zIndex: 95,
-    }}>
+<section className="hero-section" style={{
+  background: "#F8F9FA",
+  padding: "1rem 2rem",
+  display: "grid",
+  gridTemplateColumns: "1fr 480px",
+  gap: "1.2rem",
+  alignItems: "stretch",
+  position: "relative",
+  zIndex: 95,
+  height: "calc(100vh - 114px)",  // 100vh minus navbar(52px) + filters(56px) + 6px buffer
+  maxHeight: "calc(100vh - 114px)",
+  overflow: "hidden",
+}}>
 
       {/* LEFT */}
 
 <div style={{
   position: "relative",
   borderRadius: 20,
-  overflow: "hidden",   // ✅ THIS is what clips the grey corners
-  background: "#0F766E", // ✅ hides any gap while image loads
+  overflow: "hidden",
+  background: "#0F766E",
+  height: "100%",
 }}>
         <HeroSlider />
 
@@ -900,14 +860,14 @@ const Hero = ({
         }} />
 
         {/* TEXT + SEARCH */}
-        <div style={{
-          position: "absolute",
-          bottom: 20,
-          left: 16,
-          right: 16,
-          zIndex: 100,
-          overflow: "visible",
-        }}>
+<div style={{
+  position: "absolute",
+  bottom: 40,
+  left: 36,
+  right: 36,
+  zIndex: 100,
+  overflow: "visible",
+}}>
           <h1 style={{
             fontFamily: "'Georgia', serif",
             fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
@@ -926,130 +886,216 @@ const Hero = ({
             Verified rooms. Zero brokerage.
           </p>
 
-          {/* 🔥 SEARCH BOX */}
-          <div
-            ref={searchBoxRef}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              background: "white",
-              borderRadius: 10,
-              padding: "6px 10px",
-              gap: 8,
-              maxWidth: 520,
-              position: "relative",
-              zIndex: 9999,
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Search city or locality..."
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                fontSize: 14,
-                padding: "8px",
-              }}
-            />
+       {/* 🔥 SEARCH BOX — clicking opens modal */}
+<div
+  ref={searchBoxRef}
+  onClick={() => setCityModalOpen(true)}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    background: "white",
+    borderRadius: 14,
+    padding: "10px 10px 10px 16px",
+    gap: 10,
+    maxWidth: 520,
+    position: "relative",
+    zIndex: 9999,
+    boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+    cursor: "pointer",
+  }}
+>
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", lineHeight: 1.2, marginBottom: 3 }}>
+      Find in and around...
+    </div>
+    <div style={{ fontSize: 13, color: "#9CA3AF" }}>
+      {locationQuery
+        ? <span style={{ color: "#111827" }}>{locationQuery}</span>
+        : <>Search your <span style={{ color: "#0F766E", fontWeight: 600 }}>city or locality</span></>
+      }
+    </div>
+  </div>
+  <button
+    style={{
+      background: "#E6F7F5", border: "none", cursor: "pointer",
+      width: 42, height: 42, borderRadius: "50%",
+      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+    }}
+    onClick={(e) => { e.stopPropagation(); setCityModalOpen(true); }}
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" strokeWidth="2.2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="8"/>
+      <circle cx="12" cy="12" r="2" fill="#0F766E" stroke="none"/>
+      <line x1="12" y1="2" x2="12" y2="6"/>
+      <line x1="12" y1="18" x2="12" y2="22"/>
+      <line x1="2" y1="12" x2="6" y2="12"/>
+      <line x1="18" y1="12" x2="22" y2="12"/>
+    </svg>
+  </button>
+  <button
+    onClick={(e) => { e.stopPropagation(); setCityModalOpen(true); }}
+    style={{
+      background: "#0F766E", color: "white", border: "none",
+      padding: "11px 22px", borderRadius: 10, fontSize: 14, fontWeight: 600,
+      cursor: "pointer", flexShrink: 0, fontFamily: "inherit", height: 44,
+    }}
+  >
+    Search
+  </button>
+</div>
 
-            <button
-              onClick={() =>
-                document
-                  .getElementById("properties-section")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              style={{
-                background: "#0F766E",
-                color: "white",
-                border: "none",
-                padding: "8px 14px",
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Search
-            </button>
-
-            {/* ✅ PROPERLY ANCHORED DROPDOWN */}
-            {showSuggestions && suggestions.length > 0 && (() => {
-              const rect = searchBoxRef.current?.getBoundingClientRect();
-              return (
-                <div style={{
-                  position: "fixed",
-                  top: rect ? rect.bottom + 4 : 0,
-                  left: rect ? rect.left : 0,
-                  width: rect ? rect.width : 520,
-                  background: "white",
-                  borderRadius: 10,
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                  zIndex: 99999,
-                  maxHeight: 240,
-                  overflowY: "auto",
-                  border: "1px solid #E5E7EB",
-                }}>
-                  {suggestions.map((
-                    s: { address: { city: any; town: any; state: any }; display_name: any },
-                    i: Key | null | undefined
-                  ) => {
-                    const city =
-                      s.address?.city ||
-                      s.address?.town ||
-                      s.address?.state ||
-                      s.display_name;
-
-                    return (
-                      <div
-                        key={i}
-                        onClick={() => {
-                          setLocationQuery(city);
-                          setShowSuggestions(false);
-                          setFilters((prev) => ({
-                            ...prev,
-                            locality: city,
-                          }));
-                          setTimeout(() => {
-                            document
-                              .getElementById("properties-section")
-                              ?.scrollIntoView({ behavior: "smooth" });
-                          }, 100);
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "#F0FDF9")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "white")
-                        }
-                        style={{
-                          padding: "10px 14px",
-                          cursor: "pointer",
-                          fontSize: 13,
-                          borderBottom: "1px solid #eee",
-                          color: "#111827",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        📍 {city}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-          </div>
+{/* 🔥 CITY MODAL */}
+</div>
         </div>
+ 
+
+{/* 🔥 CITY MODAL — outside all clipping parents */}
+{cityModalOpen && (
+  <div
+    onClick={() => setCityModalOpen(false)}
+    style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+      zIndex: 99999, display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "1rem",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        background: "white", borderRadius: 20, padding: "28px 32px",
+        width: "100%", maxWidth: 620, boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+        position: "relative",
+      }}
+    >
+      <button
+        onClick={() => setCityModalOpen(false)}
+        style={{
+          position: "absolute", top: 16, right: 16,
+          background: "#F3F4F6", border: "none", borderRadius: "50%",
+          width: 36, height: 36, cursor: "pointer", fontSize: 18,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}
+      >✕</button>
+
+      <div style={{
+        display: "flex", alignItems: "center", background: "#F9FAFB",
+        borderRadius: 14, padding: "12px 16px", gap: 10, marginBottom: 28,
+        border: "1.5px solid #E5E7EB",
+      }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 4 }}>
+            Find in and around...
+          </div>
+          <input
+            autoFocus
+            type="text"
+            placeholder=""
+            value={modalQuery}
+            onChange={(e) => {
+              setModalQuery(e.target.value);
+              setLocationQuery(e.target.value);
+              setFilters((prev) => ({ ...prev, locality: e.target.value }));
+            }}
+            style={{
+              border: "none", outline: "none", fontSize: 13,
+              background: "transparent", width: "100%", fontFamily: "inherit", color: "#111827",
+            }}
+          />
+          {!modalQuery && (
+            <div style={{ fontSize: 13, color: "#9CA3AF", marginTop: -18, pointerEvents: "none" }}>
+              Search your <span style={{ color: "#0F766E", fontWeight: 600 }}>location</span>
+            </div>
+          )}
+        </div>
+        <button
+          style={{
+            background: "#E6F7F5", border: "none", cursor: "pointer",
+            width: 42, height: 42, borderRadius: "50%",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+          onClick={() => {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+              try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
+                const data = await res.json();
+                const city = data.address?.city || data.address?.town || data.address?.suburb || "";
+                if (city) {
+                  setLocationQuery(city);
+                  setModalQuery(city);
+                  setFilters((prev) => ({ ...prev, locality: city }));
+                  setCityModalOpen(false);
+                  setTimeout(() => document.getElementById("properties-section")?.scrollIntoView({ behavior: "smooth" }), 100);
+                }
+              } catch {}
+            });
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" strokeWidth="2.2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="8"/>
+            <circle cx="12" cy="12" r="2" fill="#0F766E" stroke="none"/>
+            <line x1="12" y1="2" x2="12" y2="6"/>
+            <line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="6" y2="12"/>
+            <line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </button>
+        <button
+          onClick={() => {
+            setFilters((prev) => ({ ...prev, locality: modalQuery }));
+            setCityModalOpen(false);
+            setTimeout(() => document.getElementById("properties-section")?.scrollIntoView({ behavior: "smooth" }), 100);
+          }}
+          style={{
+            background: "#0F766E", color: "white", border: "none",
+            padding: "10px 20px", borderRadius: 10, fontSize: 14,
+            fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+          }}
+        >Search</button>
       </div>
 
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#111827", marginBottom: 16 }}>
+        Popular Cities
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+        {POPULAR_CITIES.map((city) => (
+          <div
+            key={city.name}
+            onClick={() => {
+              setLocationQuery(city.name);
+              setModalQuery(city.name);
+              setFilters((prev) => ({ ...prev, locality: city.name }));
+              setCityModalOpen(false);
+              setTimeout(() => document.getElementById("properties-section")?.scrollIntoView({ behavior: "smooth" }), 100);
+            }}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "center",
+              gap: 8, padding: "16px 8px", borderRadius: 12, cursor: "pointer",
+              border: "1.5px solid #E5E7EB", background: "#FAFAFA", transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLDivElement).style.borderColor = "#0F766E";
+              (e.currentTarget as HTMLDivElement).style.background = "#F0FDF9";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLDivElement).style.borderColor = "#E5E7EB";
+              (e.currentTarget as HTMLDivElement).style.background = "#FAFAFA";
+            }}
+          >
+            <span style={{ fontSize: 32 }}>{city.icon}</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#374151", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+              {city.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+
       {/* RIGHT CARDS */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, height: "100%", minHeight: 0 }}>
         {[
           {
             title: "PG Stays",
@@ -1073,19 +1119,23 @@ const Hero = ({
           <div
             key={card.title}
             onClick={() => {
+  
+  setCityModalOpen(true);   // 🔥 ADD THIS
               setActiveType(card.type);
               document
                 .getElementById("properties-section")
                 ?.scrollIntoView({ behavior: "smooth" });
             }}
-            style={{
-              position: "relative",
-              borderRadius: 16,
-              overflow: "hidden",   // ✅ keep images clipped inside cards
-              minHeight: 120,
-              cursor: "pointer",
-              transition: "transform 0.2s",
-            }}
+        style={{
+  position: "relative",
+  borderRadius: 18,
+  overflow: "hidden",
+  minHeight: 165,
+  cursor: "pointer",
+  transition: "transform 0.2s, box-shadow 0.2s",
+  boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+  flex: 1,
+}}
             onMouseEnter={(e) =>
               (e.currentTarget.style.transform = "translateY(-2px)")
             }
@@ -1106,43 +1156,69 @@ const Hero = ({
             />
 
             <div style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(to right, rgba(255,255,255,0.88), transparent)",
-            }} />
+  position: "absolute",
+  inset: 0,
+  background: "linear-gradient(to right, rgba(255,255,255,0.75) 40%, transparent)",
+}} />
 
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0 16px",
-            }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>
-                  {card.title}
-                </div>
-                <div style={{ fontSize: 12, color: "#555", marginTop: 2 }}>
-                  {card.subtitle}
-                </div>
-              </div>
+           <div style={{
+  position: "absolute",
+  inset: 0,
+  display: "flex",
+  alignItems: "flex-end",
+  justifyContent: "space-between",
+  padding: "0 20px 20px",
+}}>
+  <div style={{ flex: 1 }}>
+    <div style={{ fontWeight: 700, fontSize: 18, color: "#111827", lineHeight: 1.25 }}>
+      {card.title}
+    </div>
+    {/* subtitle — hides on hover */}
+    <div
+      className={`card-subtitle-${card.type}`}
+      style={{ fontSize: 13, color: "#444", marginTop: 4, transition: "all 0.3s" }}
+    >
+      {card.subtitle}
+    </div>
+    {/* description — shows on hover */}
+    <div
+      className={`card-desc-${card.type}`}
+      style={{
+        fontSize: 13,
+        color: "#111827",
+        marginTop: 4,
+        maxHeight: 0,
+        overflow: "hidden",
+        opacity: 0,
+        transition: "all 0.35s ease",
+        lineHeight: 1.5,
+      }}
+    >
+      {card.type === "PG" && "Affordable, verified PGs with all amenities near you."}
+      {card.type === "Hostel" && "Safe & budget-friendly hostels for students & professionals."}
+      {card.type === "Room" && "Private and shared rooms with flexible rental options."}
+    </div>
+  </div>
 
-              <div style={{
-                width: 30,
-                height: 30,
-                borderRadius: "50%",
-                background: "#0F766E",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 16,
-                flexShrink: 0,
-              }}>
-                →
-              </div>
-            </div>
+  <div style={{
+    width: 38,
+    height: 38,
+    borderRadius: "50%",
+    background: "white",
+    color: "#0F766E",
+    border: "2px solid #E5E7EB",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 18,
+    flexShrink: 0,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    marginLeft: 12,
+    marginBottom: 2,
+  }}>
+    →
+  </div>
+</div>
           </div>
         ))}
       </div>
@@ -1199,28 +1275,29 @@ const Filters = ({
       zIndex: 90,
       boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
-      <div style={{
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "12px 0", overflowX: "auto", scrollbarWidth: "none",
-        minHeight: 56,
-      }}>
-        {/* Type toggle */}
-        <div style={{ display: "flex", background: "#F3F4F6", borderRadius: 8, padding: 3, flexShrink: 0 }}>
-          <select
-  style={selectStyle}
-  value={activeType || ""}
-  onChange={(e) => onTypeChange(e.target.value)}
->
-  <option value="PG">PG</option>
-  <option value="Hostel">Hostel</option>
-  <option value="Room">Room</option>
-</select>
-        </div>
+     <div style={{
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "12px 0",
+  overflowX: "auto",
+  WebkitOverflowScrolling: "touch",
+  scrollbarWidth: "none",
+  minHeight: 56,
+  flexWrap: "nowrap",
+}}>
+  {/* Type */}
+  <select
+    style={selectStyle}
+    value={activeType || ""}
+    onChange={(e) => onTypeChange(e.target.value)}
+  >
+    <option value="PG">PG</option>
+    <option value="Hostel">Hostel</option>
+    <option value="Room">Room</option>
+  </select>
 
-        <div style={{ width: 1, height: 24, background: "#E5E7EB", flexShrink: 0 }} />
-
-       {/* 🔥 FILTER DROPDOWNS (FULL FIXED + CONSISTENT) */}
-<div className="filters-container">
+  <div style={{ width: 1, height: 24, background: "#E5E7EB", flexShrink: 0 }} />
 
   {/* Locality */}
   <select
@@ -1230,9 +1307,7 @@ const Filters = ({
   >
     <option value="">Locality</option>
     {localities.map((loc) => (
-      <option key={loc} value={loc}>
-        {loc}
-      </option>
+      <option key={loc} value={loc}>{loc}</option>
     ))}
   </select>
 
@@ -1244,13 +1319,11 @@ const Filters = ({
   >
     <option value="">Budget</option>
     {budgets.map((b) => (
-      <option key={b} value={b}>
-        Under ₹{b}
-      </option>
+      <option key={b} value={b}>Under ₹{b}</option>
     ))}
   </select>
 
-  {/* Category (Gender) */}
+  {/* Category */}
   <select
     style={selectStyle}
     value={filters.gender || ""}
@@ -1258,9 +1331,7 @@ const Filters = ({
   >
     <option value="">Category</option>
     {categories.map((cat) => (
-      <option key={cat} value={cat}>
-        {cat}
-      </option>
+      <option key={cat} value={cat}>{cat}</option>
     ))}
   </select>
 
@@ -1272,19 +1343,35 @@ const Filters = ({
   >
     <option value="">Sharing Type</option>
     {sharingTypes.map((s) => (
-      <option key={s} value={s}>
-        {s}
-      </option>
+      <option key={s} value={s}>{s}</option>
     ))}
   </select>
-
 </div>
-       
-      </div>
 
       <style>{`
         div::-webkit-scrollbar { display: none; }
         select:focus { outline: 2px solid #0F766E; }
+        /* Right card hover — show description, hide subtitle */
+.hero-section > div:last-child > div:hover .card-subtitle-PG,
+.hero-section > div:last-child > div:hover .card-subtitle-Hostel,
+.hero-section > div:last-child > div:hover .card-subtitle-Room {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+}
+
+.hero-section > div:last-child > div:hover .card-desc-PG,
+.hero-section > div:last-child > div:hover .card-desc-Hostel,
+.hero-section > div:last-child > div:hover .card-desc-Room {
+  max-height: 60px !important;
+  opacity: 1 !important;
+}
+
+.card-subtitle-PG, .card-subtitle-Hostel, .card-subtitle-Room {
+  transition: opacity 0.25s, max-height 0.25s;
+  max-height: 30px;
+  overflow: hidden;
+}
       `}</style>
     </div>
   );
@@ -1573,7 +1660,7 @@ if (activeType) {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#F0FDF9", minHeight: "100vh", color: "#111827" }}>
+    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#F0FDF9", color: "#111827" }}>
       {/* Google Fonts */}
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
@@ -1797,6 +1884,28 @@ if (activeType) {
       gap: 6px;
     }
 
+    /* ─── NAVBAR MOBILE FIX ─────────────────── */
+nav {
+  padding: 0 1rem !important;
+  height: 56px !important;
+}
+
+nav > a img {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+nav > a span {
+  font-size: 16px !important;
+}
+
+nav > div > button {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  border-radius: 50px !important;
+  white-space: nowrap !important;
+}
+
     .navbar > a {
       flex-shrink: 0;
     }
@@ -1847,9 +1956,16 @@ if (activeType) {
 
     /* Give the slider a fixed height */
     .hero-section > div:first-child {
-      min-height: 300px !important;
-      height: 300px !important;
-    }
+  min-height: 300px !important;
+  height: 300px !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: auto !important;
+    max-height: none !important;
+  }
+}
 
     /* Right cards → horizontal scroll row */
     .hero-section > div:last-child {
@@ -1865,12 +1981,51 @@ if (activeType) {
     }
 
     /* Each card fixed width */
-    .hero-section > div:last-child > div {
-      min-width: 155px !important;
-      min-height: 90px !important;
-      flex-shrink: 0 !important;
-      border-radius: 12px !important;
-    }
+   /* Each card fixed width */
+.hero-section > div:last-child > div {
+  min-width: 140px !important;
+  min-height: 100px !important;
+  flex-shrink: 0 !important;
+  border-radius: 12px !important;
+}
+
+/* Fix card gradient on mobile */
+.hero-section > div:last-child > div > div:nth-child(2) {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.85) 100%) !important;
+}
+
+/* Fix card text layout on mobile */
+.hero-section > div:last-child > div > div:nth-child(3) {
+  padding: 8px 10px 10px !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+}
+
+/* Hide the arrow button on mobile cards */
+/* Show smaller arrow on mobile cards */
+.hero-section > div:last-child > div > div:nth-child(3) > div:last-child {
+  display: flex !important;
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 13px !important;
+  margin-left: 6px !important;
+  margin-bottom: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Card title on mobile */
+.hero-section > div:last-child > div > div:nth-child(3) > div:first-child > div:first-child {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+/* Card subtitle on mobile */
+.hero-section > div:last-child > div > div:nth-child(3) > div:first-child > div:nth-child(2) {
+  font-size: 11px !important;
+  margin-top: 2px !important;
+}
 
     /* ─── PROPERTY CARDS ─────────────────────── */
     .property-card {
@@ -1882,15 +2037,17 @@ if (activeType) {
       height: 200px !important;
     }
 
-    /* ─── FILTERS ────────────────────────────── */
-    .filters-container {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      overflow-x: auto !important;
-      gap: 8px !important;
-      scrollbar-width: none !important;
-    }
-
+/* ─── FILTERS ────────────────────────────── */
+.filters-container {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  gap: 8px !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
     .filters-container::-webkit-scrollbar {
       display: none;
     }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function DocumentPage() {
   const [data, setData] = useState<any>(null);
@@ -78,15 +79,15 @@ export default function DocumentPage() {
   return (
     <div className="min-h-screen bg-[#F5F7F9]">
 
-      {/* HEADER */}
-      <div className="bg-white px-4 py-4 flex items-center gap-3">
+     {/* HEADER */}
+<div className="bg-teal-600 px-4 py-4 flex items-center gap-3">
 
   {/* BACK BUTTON */}
   <button
     onClick={() => router.back()}
-    className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white shadow"
+    className="w-10 h-10 flex items-center justify-center rounded-full text-white shadow"
   >
-    ←
+    <ArrowLeft></ArrowLeft>
   </button>
 
   {/* TITLE */}

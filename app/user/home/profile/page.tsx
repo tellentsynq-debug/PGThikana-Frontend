@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/app/context/SnackbarContext";
-import { ArrowLeft, Mail, Phone, MapPin, Home, Shield, Globe } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Home, Shield, Globe, MessageCircle, Building2, Heart } from "lucide-react";
 
 const API_BASE = "https://pgthikana.in/api";
 
@@ -122,6 +122,41 @@ export default function ProfilePage() {
           <Info icon={<Shield size={16} />} label="Emergency" value={user.emergency_number} />
 
         </div>
+
+ {/* 🔥 MOBILE NAVIGATION */}
+<div className="bg-white rounded-3xl shadow-md overflow-hidden md:hidden">
+
+  <ActionItem
+    icon={<Home size={18} />}
+    label="Home"
+    onClick={() => router.push("/")}
+  />
+
+  <Divider />
+
+  <ActionItem
+    icon={<Heart size={18} />}
+    label="Saved PGs"
+    onClick={() => router.push("/user/home/saved")}
+  />
+
+  <Divider />
+
+  <ActionItem
+    icon={<Building2 size={18} />}
+    label="Bookings"
+    onClick={() => router.push("/user/home/bookings")}
+  />
+
+  <Divider />
+
+  <ActionItem
+    icon={<MessageCircle size={18} />}
+    label="Chat"
+    onClick={() => router.push("/user/home/chat")}
+  />
+
+</div>
 
         {/* 🔥 ACTIONS */}
         <div className="bg-white rounded-3xl shadow-md overflow-hidden">

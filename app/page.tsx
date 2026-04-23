@@ -1019,7 +1019,15 @@ const [modalQuery, setModalQuery] = useState("");
               try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
                 const data = await res.json();
-                const city = data.address?.city || data.address?.town || data.address?.suburb || "";
+                const addr = data.address || {};
+
+const city =
+  addr.city ||
+  addr.town ||
+  addr.county ||
+  addr.state_district ||
+  addr.state ||
+  "";
                 if (city) {
                   setLocationQuery(city);
                   setModalQuery(city);
@@ -1057,7 +1065,13 @@ const [modalQuery, setModalQuery] = useState("");
       <div style={{ fontSize: 15, fontWeight: 700, color: "#111827", marginBottom: 16 }}>
         Popular Cities
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+      <div
+  style={{
+    display: "flex",
+    gap: 10,
+    overflowX: "auto",
+  }}
+>
         {POPULAR_CITIES.map((city) => (
           <div
             key={city.name}
@@ -1069,10 +1083,18 @@ const [modalQuery, setModalQuery] = useState("");
               setTimeout(() => document.getElementById("properties-section")?.scrollIntoView({ behavior: "smooth" }), 100);
             }}
             style={{
-              display: "flex", flexDirection: "column", alignItems: "center",
-              gap: 8, padding: "16px 8px", borderRadius: 12, cursor: "pointer",
-              border: "1.5px solid #E5E7EB", background: "#FAFAFA", transition: "all 0.2s",
-            }}
+  minWidth: 80,
+  flexShrink: 0,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 6,
+  padding: "12px 6px",
+  borderRadius: 12,
+  cursor: "pointer",
+  border: "1.5px solid #E5E7EB",
+  background: "#FAFAFA",
+}}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLDivElement).style.borderColor = "#0F766E";
               (e.currentTarget as HTMLDivElement).style.background = "#F0FDF9";
@@ -1498,22 +1520,26 @@ const [showSuggestions, setShowSuggestions] = useState(false);
         );
         const data = await res.json();
 
-        const locality =
-          data.address?.city ||
-          data.address?.town ||
-          data.address?.suburb ||
-          data.address?.village ||
-          "";
+      const addr = data.address || {};
 
-        if (locality) {
+const city =
+  addr.city ||
+  addr.town ||
+  addr.county ||        // 🔥 important fallback
+  addr.state_district || // 🔥 better than suburb
+  addr.state ||
+  "";
+
+
+        if (city) {
           // ✅ SET FILTER (already correct)
           setFilters((prev) => ({
             ...prev,
-            locality,
+           locality: city, 
           }));
 
           // ✅ ADD THIS (IMPORTANT 🔥)
-          setLocationQuery(locality);
+          setLocationQuery(city);
         }
       } catch (err) {
         console.log("Location fetch failed");

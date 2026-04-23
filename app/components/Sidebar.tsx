@@ -25,6 +25,8 @@ export default function Sidebar() {
   const [role, setRole] = useState<"superadmin" | "admin" | "user" | null>(null);
   const [username, setUsername] = useState("");
 
+  const isUserRoute = pathname.startsWith("/user");
+
   const iconSize = 18;
 
 useEffect(() => {
@@ -128,7 +130,7 @@ useEffect(() => {
   return (
     <>
       {/* ✅ MOBILE TOGGLE BUTTON */}
-      {isMobile && (
+      {isMobile && !isUserRoute && (
         <button
           onClick={() => setIsOpen(!isOpen)}
           style={{
@@ -169,7 +171,7 @@ boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
         onMouseEnter={() => !isMobile && setIsOpen(true)}
         onMouseLeave={() => !isMobile && setIsOpen(false)}
         style={{
-          width: isMobile ? 260 : sidebarWidth,
+          width: isMobile && isUserRoute ? 0 : isMobile ? 260 : sidebarWidth,
           height: "100vh",
           backgroundColor: "#0F766E",
           color: "white",

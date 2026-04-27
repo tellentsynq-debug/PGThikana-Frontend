@@ -73,14 +73,17 @@ useEffect(() => {
 
       const data = await res.json();
 
-      if (res.status === 200) {
-localStorage.setItem("userToken", data.token);
+     if (res.status === 200) {
+  localStorage.setItem("userToken", data.token);
 
-// 🔥 notify whole app
-window.dispatchEvent(new Event("authChanged"));
+  window.dispatchEvent(new Event("authChanged"));
 
-window.location.href = "/";
-      } else if (res.status === 404) {
+  toast("Login Successful!");
+
+  setTimeout(() => {
+    router.push("/");
+  }, 1200);
+}else if (res.status === 404) {
         router.push(`/user/name?phone=${phone}&otp=${otp.join("")}`);
       } else {
         toast(data.message || "OTP Failed");

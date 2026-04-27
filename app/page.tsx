@@ -662,6 +662,42 @@ const Navbar = ({ onSearch }: { onSearch: (q: string) => void }) => {
 
   const pathname = usePathname();
 
+  const [notificationCount, setNotificationCount] = useState(0);
+
+
+  useEffect(() => {
+  const fetchNotificationCount = async () => {
+    try {
+      const token = localStorage.getItem("userToken");
+      if (!token) return;
+
+      const res = await fetch(
+        "https://pgthikana.in/api/notifications/count",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (data?.success) {
+        setNotificationCount(data.unreadCount || 0);
+      }
+    } catch (err) {
+      console.log("Notification count error");
+    }
+  };
+
+  fetchNotificationCount();
+
+  // 🔥 OPTIONAL: auto refresh every 15 sec
+  const interval = setInterval(fetchNotificationCount, 15000);
+
+  return () => clearInterval(interval);
+}, []);
+
 
 useEffect(() => {
   const checkAuth = () => {
@@ -771,21 +807,79 @@ useEffect(() => {
         </button>
       </>
     ) : (
-      <div
-        onClick={() => router.push("/user/home/profile")}
-        style={{
-          width: 36, height: 36, borderRadius: "50%",
-          background: "#0F766E", color: "white",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontWeight: 700, cursor: "pointer", fontSize: 14,
-        }}
-      >
-        {(() => {
-          const name = localStorage.getItem("username") || "User";
-          return name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
-        })()}
-      </div>
-    )}
+  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    
+    {/* 🔔 NOTIFICATION BUTTON */}
+    <div
+      onClick={() => router.push("/user/home/notifications")}
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        background: "#F0FDF9",
+        border: "1px solid #A7F3D0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        position: "relative",
+      }}
+    >
+      {/* Bell Icon */}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" strokeWidth="2">
+        <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 7h18s-3 0-3-7"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+{notificationCount > 0 && (
+  <div
+    style={{
+      position: "absolute",
+      top: -4,
+      right: -4,
+      minWidth: 18,
+      height: 18,
+      padding: "0 5px",
+      background: "#EF4444",
+      color: "white",
+      borderRadius: 20,
+      fontSize: 10,
+      fontWeight: 700,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      lineHeight: 1,
+    }}
+  >
+    {notificationCount > 9 ? "9+" : notificationCount}
+  </div>
+)}
+    </div>
+
+    {/* 👤 PROFILE ICON */}
+    <div
+      onClick={() => router.push("/user/home/profile")}
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        background: "#0F766E",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 700,
+        cursor: "pointer",
+        fontSize: 14,
+      }}
+    >
+      {(() => {
+        const name = localStorage.getItem("username") || "User";
+        return name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
+      })()}
+    </div>
+
+  </div>
+)}
   </div>
 </nav>
   );

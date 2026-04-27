@@ -74,12 +74,22 @@ const verifyOtp = async () => {
     const data = await res.json();
 
     // ✅ CASE 1: USER EXISTS (LOGIN SUCCESS)
-    if (res.status === 200 && data.success) {
-      localStorage.setItem("vendorToken", data.token);
+  if (res.status === 200 && data.success) {
+  localStorage.setItem("vendorToken", data.token);
 
-      router.push("/vendor/dashboard");
-      return; // 🔥 VERY IMPORTANT
-    }
+  // 🔥 notify app
+  window.dispatchEvent(new Event("authChanged"));
+
+  // ✅ SHOW TOAST
+  toast("Login Successful!");
+
+  // ⏳ DELAY NAVIGATION
+  setTimeout(() => {
+    router.push("/vendor/dashboard");
+  }, 1200);
+
+  return;
+}
 
     // ✅ CASE 2: USER NOT FOUND (SIGNUP FLOW)
     if (

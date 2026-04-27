@@ -139,7 +139,7 @@ export default function PropertyImagesPage() {
       const text = await res.text();
 
       if (res.status === 200 || res.status === 201) {
-        toast("Property Created Successfully 🎉");
+        toast("Property Created Successfully!");
         router.push("/vendor/dashboard");
       } else {
         toast("Error: " + text);

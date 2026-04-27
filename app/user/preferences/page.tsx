@@ -70,9 +70,19 @@ useEffect(() => {
       const data = await res.json();
 
       if (res.status === 200 || res.status === 201) {
-        localStorage.setItem("userToken", data.token); // ✅ FIXED TOKEN KEY
-        router.push("/user/home"); // ✅ FIXED ROUTE
-      } else {
+  localStorage.setItem("userToken", data.token);
+
+  // 🔥 notify navbar / app
+  window.dispatchEvent(new Event("authChanged"));
+
+  // ✅ SHOW TOAST
+  toast("Account Created Successfully!");
+
+  // ⏳ DELAY REDIRECT (IMPORTANT)
+  setTimeout(() => {
+    router.push("/user/home");
+  }, 1200);
+} else {
         toast(data.message || "Signup failed");
       }
     } catch (err) {

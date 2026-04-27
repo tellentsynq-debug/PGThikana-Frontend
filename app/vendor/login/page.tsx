@@ -35,13 +35,18 @@ const sendOtp = async () => {
     const data = await res.json();
 
     // ✅ CASE 1: NEW USER
-    if (
-      res.status === 200 &&
-      !data.message?.toLowerCase().includes("already")
-    ) {
-      router.push(`/vendor/otp?phone=${phone}`);
-      return; // ✅ IMPORTANT
-    }
+   if (
+  res.status === 200 &&
+  !data.message?.toLowerCase().includes("already")
+) {
+  toast("OTP Sent Successfully!");
+
+  setTimeout(() => {
+    router.push(`/vendor/otp?phone=${phone}`);
+  }, 1000);
+
+  return;
+}
 
     // ✅ CASE 2: ALREADY REGISTERED
     if (data.message?.toLowerCase().includes("already")) {
@@ -61,9 +66,14 @@ const sendOtp = async () => {
       const loginData = await loginRes.json();
 
       if (loginRes.status === 200) {
-        router.push(`/vendor/otp?phone=${phone}`);
-        return; // ✅ IMPORTANT
-      } else {
+  toast("Login OTP Sent!");
+
+  setTimeout(() => {
+    router.push(`/vendor/otp?phone=${phone}`);
+  }, 1000);
+
+  return;
+} else {
         toast(loginData.message || "Login OTP failed");
       }
     } else {

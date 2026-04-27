@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { Bell, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "@/app/context/SnackbarContext";
@@ -31,16 +31,34 @@ export default function DashboardPage() {
 
   const router = useRouter();
 
+  const [notificationCount, setNotificationCount] = useState(0);
+
   const token =
     typeof window !== "undefined" ? localStorage.getItem("vendorToken") : null;
 
   useEffect(() => {
-    fetchAll().finally(() => setLoading(false));
-  }, []);
+  fetchAll();
+  fetchNotificationCount(); // 🔥 ADD THIS
+}, []);
 
   const fetchAll = async () => {
     await Promise.all([fetchMyProperties(), fetchBookings(), fetchProfile()]);
   };
+
+  const fetchNotificationCount = async () => {
+  try {
+    const res = await fetch("https://pgthikana.in/api/notifications/count", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      setNotificationCount(data.unreadCount || 0);
+    }
+  } catch (e) {
+    console.log("Notification count error", e);
+  }
+};
 
   const fetchMyProperties = async () => {
     try {
@@ -93,21 +111,28 @@ export default function DashboardPage() {
 
         {/* ── HEADER ─────────────────────────────────────────────────── */}
         <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            {/* Avatar */}
-            <div className="h-11 w-11 rounded-full bg-[#0F766E] flex items-center justify-center text-white font-bold text-lg shadow-sm select-none">
-              {vendorName?.charAt(0)?.toUpperCase() || "V"}
-            </div>
-         <div
-  onClick={() => router.push("/vendor/dashboard/profile")}
-  className="cursor-pointer"
->
-  <h1 className="text-[1.15rem] font-bold text-[#1A1A1A] leading-tight">
-    {vendorName}
-  </h1>
-  <p className="text-sm text-[#666]">Property Manager</p>
+        <div className="flex items-center gap-3">
+
+  {/* 🔔 Notification Button */}
+  <div
+    onClick={() => router.push("/vendor/dashboard/notifications")}
+    className="relative cursor-pointer"
+  >
+    <div className="h-10 w-10 rounded-full bg-[#E6F4F2] flex items-center justify-center hover:bg-[#d1eeea] transition">
+      <Bell size={18} className="text-[#0F766E]" />
+    </div>
+
+    {/* 🔴 Badge */}
+    {notificationCount > 0 && (
+      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+        {notificationCount > 9 ? "9+" : notificationCount}
+      </span>
+    )}
+  </div>
+
+
+
 </div>
-          </div>
 <button
   onClick={() => router.push("/vendor/dashboard/chat")}
   className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0F766E] hover:bg-[#0c6560] text-white shadow-md transition-all active:scale-95"
